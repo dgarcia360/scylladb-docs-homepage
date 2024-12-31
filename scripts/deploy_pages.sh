@@ -14,7 +14,7 @@ if git ls-remote --heads "$REPO_URL" gh-pages; then
     cd "${GH_PAGES_DIR}-existing"
 
     echo "Cleaning up existing content..."
-    find . -mindepth 1 -not -name 'manual' -not -name ".git" -exec rm -rf {} +
+    find . -mindepth 1 -not -path './.git*' -not -path './manual*' -exec rm -rf {} +
 
     echo "Copying new documentation..."
     cp -r ../$GH_PAGES_DIR/* .
@@ -22,16 +22,13 @@ if git ls-remote --heads "$REPO_URL" gh-pages; then
     echo "Configuring Git..."
     git config --local user.email "action@scylladb.com"
     git config --local user.name "GitHub Action"
-    git remote add origin "$REPO_URL" || true
 
     echo "Committing and pushing changes..."
     git add .
     git commit -m "Update docs" || true
     git push origin gh-pages --force
-
 else
     echo "Error: The gh-pages branch does not exist in the repository."
     echo "Please create a gh-pages branch in your repository and re-run the script."
     exit 1
 fi
-
