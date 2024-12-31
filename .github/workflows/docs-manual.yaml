@@ -23,7 +23,7 @@ jobs:
 
       - name: Initialize and fetch all branches of submodule
         run: |
-          git submodule update --init --recursive
+          git submodule update --init --recursive || true
           cd submodules/scylladb
           git fetch --all
 
