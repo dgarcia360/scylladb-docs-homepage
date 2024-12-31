@@ -14,13 +14,12 @@ if git ls-remote --heads "$REPO_URL" gh-pages; then
     cd "${GH_PAGES_DIR}-existing"
 
     echo "Cleaning up existing content..."
-    find . -mindepth 1 -not -name 'manual' -exec rm -rf {} +
+    find . -mindepth 1 -not -name 'manual' -not -name ".git" -exec rm -rf {} +
 
     echo "Copying new documentation..."
     cp -r ../$GH_PAGES_DIR/* .
     
     echo "Configuring Git..."
-    git init
     git config --local user.email "action@scylladb.com"
     git config --local user.name "GitHub Action"
     git remote add origin "$REPO_URL" || true
@@ -35,3 +34,4 @@ else
     echo "Please create a gh-pages branch in your repository and re-run the script."
     exit 1
 fi
+
