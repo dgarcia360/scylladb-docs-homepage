@@ -14,7 +14,7 @@ if git ls-remote --heads "$REPO_URL" gh-pages; then
     cd "${GH_PAGES_DIR}-existing"
 
     # Remove all except the "manual" folder
-    find . -mindepth 1 -not -name 'manual' -exec rm -rf {} +
+    find . -mindepth 1 -not -name 'manual' -not -name '.git' -exec rm -rf {} +
 
     # Copy new docs
     cp -r ../$GH_PAGES_DIR/* .
