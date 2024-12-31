@@ -23,7 +23,6 @@ if git ls-remote --heads "$REPO_URL" gh-pages; then
     echo "Configuring Git..."
     git config --local user.email "action@scylladb.com"
     git config --local user.name "GitHub Action"
-    git remote add origin "$REPO_URL" || true
 
     echo "Committing and pushing changes..."
     git add .
