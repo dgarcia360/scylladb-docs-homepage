@@ -1,47 +1,35 @@
-name: "Docs / Publish docs.scylladb.com/manual"
+#!/usr/bin/env bash
 
-env:
-  FLAG: manual
+# Variables
+REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+GH_PAGES_DIR="gh-pages"
 
-on:
-  schedule:
-    # Run daily at 00:00 UTC
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+echo "Preparing docs dir..."
+mkdir -p $GH_PAGES_DIR
+cp -r ./docs/_build/dirhtml/. $GH_PAGES_DIR
 
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.repository.default_branch }}
-          persist-credentials: false
-          fetch-depth: 0
-          submodules: true
+if git ls-remote --heads "$REPO_URL" gh-pages; then
+    echo "Cloning existing gh-pages branch..."
+    git clone --branch gh-pages --single-branch "$REPO_URL" "${GH_PAGES_DIR}-existing"
+    cd "${GH_PAGES_DIR}-existing"
 
-      - name: Initialize and fetch all branches of submodule
-        run: |
-          git submodule update --init --recursive
-          cd submodules/scylladb
-          git fetch --all
+    echo "Cleaning up existing content..."
+    find . -mindepth 1 -not -path './.git*' -not -path './manual*' -exec rm -rf {} +
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+    echo "Copying new documentation..."
+    cp -r ../$GH_PAGES_DIR/* .
+    
+    echo "Configuring Git..."
+    git config --local user.email "action@scylladb.com"
+    git config --local user.name "GitHub Action"
 
-      - name: Set up env
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" setupenv
+    echo "Committing and pushing changes..."
+    git add .
+    git commit -m "Update docs" || true
+    git push origin gh-pages --force
 
-      - name: Build docs
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" multiversion
-
-      - name: Build redirects
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" redirects
-
-      - name: Deploy docs to GitHub Pages
-        run: ./scripts/deploy_manual.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+else
+    echo "Error: The gh-pages branch does not exist in the repository."
+    echo "Please create a gh-pages branch in your repository and re-run the script."
+    exit 1
+fi
