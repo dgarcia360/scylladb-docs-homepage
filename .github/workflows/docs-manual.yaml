@@ -26,6 +26,15 @@ jobs:
           git submodule sync
           git submodule update --init --remote
 
+      - name: Modify conf.py
+        run: |
+          sed -i "s/^scylladb_markdown_recommonmark_versions *= *.*$/scylladb_markdown_recommonmark_versions = []/" submodules/scylladb/docs/conf.py
+
+      - name: Verify changes
+        run: |
+          echo "Modified conf.py content:"
+          cat submodules/scylladb/docs/conf.py
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
