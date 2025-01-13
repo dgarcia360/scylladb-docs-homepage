@@ -26,6 +26,8 @@ jobs:
           git submodule update --init
           cd submodules/scylladb
           git fetch --all
+          git log
+          git checkout origin/master
 
       - name: Set up Python
         uses: actions/setup-python@v5
