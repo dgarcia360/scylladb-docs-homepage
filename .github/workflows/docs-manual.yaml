@@ -21,11 +21,16 @@ jobs:
           fetch-depth: 0
           submodules: true
 
+      - name: Fetch submodules latest version
+        run: |
+          git submodule sync
+          git submodule update --init --remote
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-
+    
       - name: Set up env
         run: |
           cd submodules/scylladb/docs
