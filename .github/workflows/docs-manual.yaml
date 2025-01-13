@@ -27,13 +27,19 @@ jobs:
           python-version: '3.12'
 
       - name: Set up env
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" setupenv
+        run: |
+          cd submodules/scylladb/docs
+          make FLAG="${{ env.FLAG }}" setupenv
 
       - name: Build docs
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" multiversion
+        run: |
+          cd submodules/scylladb/docs
+          make FLAG="${{ env.FLAG }}" multiversion
           
       - name: Build redirects
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" redirects
+        run: |
+          cd submodules/scylladb/docs
+          make FLAG="${{ env.FLAG }}" redirects
 
       - name: Deploy docs to GitHub Pages
         run: ./scripts/deploy_manual.sh
