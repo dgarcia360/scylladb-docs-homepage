@@ -1,7 +1,7 @@
 name: "Docs / Publish docs.scylladb.com/manual"
 
 env:
-  FLAG: 'opensource'
+  FLAG: 'manual'
 
 on:
   schedule:
@@ -38,7 +38,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: '3.11'
     
       - name: Set up env
         run: |
