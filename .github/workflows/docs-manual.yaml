@@ -21,21 +21,16 @@ jobs:
           fetch-depth: 0
           submodules: true
 
-      - name: Fetch submodules
-        run: |
-          git submodule update --init
-          cd submodules/scylladb
-          git fetch --all
-          git show-ref
-          git clean -fdx
-          git checkout master
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
       - name: Set up env
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" setupenv
+        run:  |
+          cd submodules/scylladb/docs
+          git show-ref
+          make FLAG="${{ env.FLAG }}" setupenv
 
       - name: Build docs
         run: |
@@ -43,7 +38,9 @@ jobs:
           make FLAG="${{ env.FLAG }}" multiversion
           
       - name: Build redirects
-        run: make -C submodules/scylladb/docs FLAG="${{ env.FLAG }}" redirects
+        run: |
+          cd submodules/scylladb/docs
+          make FLAG="${{ env.FLAG }}" redirects
 
       - name: Deploy docs to GitHub Pages
         run: ./scripts/deploy_manual.sh
