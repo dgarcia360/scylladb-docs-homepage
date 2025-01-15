@@ -378,23 +378,40 @@ You can clean snapshots by using <a class="reference internal" href="operating-s
 </section>
 <section id="features">
 <h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<section id="i-want-to-try-out-new-features-how-do-i-enable-experimental-mode">
-<h3>I want to try out new features.  How do I enable experimental mode?<a class="headerlink" href="#i-want-to-try-out-new-features-how-do-i-enable-experimental-mode" title="Link to this heading">¶</a></h3>
-<p>You need to add the line <code class="code docutils literal notranslate"><span class="pre">experimental:</span> <span class="pre">true</span></code>  to your <code class="code docutils literal notranslate"><span class="pre">scylla.yaml</span></code> file.</p>
+<section id="i-want-to-try-out-new-features-how-do-i-enable-them">
+<h3>I want to try out new features.  How do I enable them?<a class="headerlink" href="#i-want-to-try-out-new-features-how-do-i-enable-them" title="Link to this heading">¶</a></h3>
+<p>ScyllaDB features can be enabled individually either through the configuration file or via command-line flags.</p>
+<p>To configure using <code class="code docutils literal notranslate"><span class="pre">scylla.yaml</span></code> file:</p>
 <ol class="arabic">
-<li><p>Launch the file in a text editor: <code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">vi</span> <span class="pre">/etc/scylla/scylla.yaml</span></code>. (Alternately, on docker, it’s <code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker</span> <span class="pre">exec</span> <span class="pre">-it</span> <span class="pre">your_node</span> <span class="pre">vi</span> <span class="pre">/etc/scylla/scylla.yaml</span></code>);</p></li>
-<li><p>Add the line <code class="code docutils literal notranslate"><span class="pre">experimental:</span> <span class="pre">true</span></code>;</p></li>
+<li><p>Open the file in a text editor:</p>
+<p>On Linux systems</p>
+<p><code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">vi</span> <span class="pre">/etc/scylla/scylla.yaml</span></code></p>
+<p>On Docker</p>
+<p><code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker</span> <span class="pre">exec</span> <span class="pre">-it</span> <span class="pre">your_node</span> <span class="pre">vi</span> <span class="pre">/etc/scylla/scylla.yaml</span></code></p>
+</li>
+<li><p>Add the features you want to enable</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Example: enabling UDF and Alternator Streams features</span>
+<span class="nt">experimental_features</span><span class="p">:</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">udf</span>
+<span class="w">   </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">alternator-streams</span>
+</pre></div>
+</div>
+</li>
 <li><p>Save the file and exit.</p></li>
-<li><p>Stop and restart the node.</p>
+<li><p>Restart the node.</p>
 <p>On RedHat Enterprise Linux, CentOS or Ubuntu:</p>
 <p><code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">systemctl</span> <span class="pre">restart</span> <span class="pre">scylla-server</span></code></p>
 <p>On Docker:</p>
 <p><code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker</span> <span class="pre">stop</span> <span class="pre">&lt;your_node&gt;</span> <span class="pre">&amp;&amp;</span> <span class="pre">docker</span> <span class="pre">start</span> <span class="pre">&lt;your_node&gt;</span></code></p>
-<p>Alternately, starting from ScyllaDB 2.0, you can start ScyllaDB for Docker with the <code class="code docutils literal notranslate"><span class="pre">experimental</span></code> flag as follows:</p>
-<p><code class="code docutils literal notranslate"><span class="pre">$</span> <span class="pre">docker</span> <span class="pre">run</span> <span class="pre">--name</span> <span class="pre">&lt;your_node&gt;</span> <span class="pre">-d</span> <span class="pre">scylladb/scylla</span> <span class="pre">--experimental</span> <span class="pre">1</span></code></p>
 </li>
 </ol>
-<p>You should now be able to use the experimental features available in your version of ScyllaDB.</p>
+<p>Alternately, starting from ScyllaDB 3.3, you can enable features directly via command line flags the <code class="code docutils literal notranslate"><span class="pre">--experimental-features</span></code> flag as follows. This command line options can be repeated multiple times. For example, to enable UDF and Alternator Streams:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>docker<span class="w"> </span>run<span class="w"> </span>--name<span class="w"> </span>&lt;your_node&gt;<span class="w"> </span>-d<span class="w"> </span>scylladb/scylla<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--experimental-features<span class="o">=</span>udf<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--experimental-features<span class="o">=</span>alternator-streams
+</pre></div>
+</div>
+<p>You should now be able to use the specified experimental features.</p>
 </section>
 <section id="how-do-i-check-the-current-version-of-scylladb-that-i-am-running">
 <h3>How do I check the current version of ScyllaDB that I am running?<a class="headerlink" href="#how-do-i-check-the-current-version-of-scylladb-that-i-am-running" title="Link to this heading">¶</a></h3>
@@ -1147,7 +1164,7 @@ or added to your <code class="docutils literal notranslate"><span class="pre">sc
 </ul>
 </li>
 <li><a class="reference internal" href="#features">Features</a><ul>
-<li><a class="reference internal" href="#i-want-to-try-out-new-features-how-do-i-enable-experimental-mode">I want to try out new features.  How do I enable experimental mode?</a></li>
+<li><a class="reference internal" href="#i-want-to-try-out-new-features-how-do-i-enable-them">I want to try out new features.  How do I enable them?</a></li>
 <li><a class="reference internal" href="#how-do-i-check-the-current-version-of-scylladb-that-i-am-running">How do I check the current version of ScyllaDB that I am running?</a></li>
 <li><a class="reference internal" href="#i-am-upgrading-my-nodes-to-a-version-that-uses-a-newer-sstable-format-when-will-the-nodes-start-using-the-new-sstable-format">I am upgrading my nodes to a version that uses a newer SSTable format, when will the nodes start using the new SSTable format?</a></li>
 </ul>
@@ -1225,7 +1242,7 @@ or added to your <code class="docutils literal notranslate"><span class="pre">sc
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 14 Jan 2025.
+                        Last updated on 15 Jan 2025.
                     
                 </div>
             

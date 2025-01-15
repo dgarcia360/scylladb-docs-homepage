@@ -542,12 +542,12 @@
 </pre></div>
 </div>
 </section>
-<section id="experimental-enable">
-<h4>–experimental ENABLE<a class="headerlink" href="#experimental-enable" title="Link to this heading">¶</a></h4>
-<p>The <code class="docutils literal notranslate"><span class="pre">--experimental</span></code> command line option enables ScyllaDB’s experimental mode. If no <code class="docutils literal notranslate"><span class="pre">--experimental</span></code> command line option is defined, ScyllaDB defaults to running with experimental mode disabled.</p>
-<p><strong>It is highly recommended to disable experimental mode for production deployments.</strong></p>
-<p>For example, to enable experimental mode:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker run --name some-scylla -d scylladb/scylla --experimental 1</span>
+<section id="experimental-features-feature">
+<h4>–experimental-features FEATURE<a class="headerlink" href="#experimental-features-feature" title="Link to this heading">¶</a></h4>
+<p>The <code class="docutils literal notranslate"><span class="pre">--experimental-features</span></code> command line option enables ScyllaDB’s experimental feature individually. If no feature flags are specified, ScyllaDB runs with only stable features enabled.</p>
+<p><strong>Running experimental features in production environments is not recommended.</strong></p>
+<p>For example, to enable the User Defined Functions (UDF) feature:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">docker run --name some-scylla -d scylladb/scylla --experimental-features=udf</span>
 </pre></div>
 </div>
 </section>
@@ -1109,7 +1109,7 @@
 <li><a class="reference internal" href="#overprovisioned-enable">–overprovisioned ENABLE</a></li>
 <li><a class="reference internal" href="#cpuset-cpuset">–cpuset CPUSET</a></li>
 <li><a class="reference internal" href="#developer-mode-enable">–developer-mode ENABLE</a></li>
-<li><a class="reference internal" href="#experimental-enable">–experimental ENABLE</a></li>
+<li><a class="reference internal" href="#experimental-features-feature">–experimental-features FEATURE</a></li>
 </ul>
 </li>
 </ul>
@@ -1169,7 +1169,7 @@
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 14 Jan 2025.
+                        Last updated on 15 Jan 2025.
                     
                 </div>
             
