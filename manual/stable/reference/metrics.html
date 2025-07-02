@@ -1323,6 +1323,24 @@
 </dd></dl>
 
 </section>
+<section id="compress">
+<h2>Compress<a class="headerlink" href="#compress" title="Link to this heading">¶</a></h2>
+<dl class="std metrics_option" id="metricsprop-scyllasstable-compression-dicts-total-live-memory-bytes">
+<dt class="sig sig-object std" id="metrics_option-scyllasstable_compression_dicts_total_live_memory_bytes">
+<span class="sig-name descname"><span class="pre">scyllasstable_compression_dicts_total_live_memory_bytes</span></span><a class="headerlink" href="#metrics_option-scyllasstable_compression_dicts_total_live_memory_bytes" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Total amount of memory consumed by SSTable compression dictionaries in RAM</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">sstable_compression_dicts</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">total_live_memory_bytes</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</section>
 <section id="row-cache">
 <h2>Row cache<a class="headerlink" href="#row-cache" title="Link to this heading">¶</a></h2>
 <dl class="std metrics_option" id="metricsprop-scyllacache-bytes-used">
@@ -3677,6 +3695,21 @@
 </div></blockquote>
 </dd></dl>
 
+<dl class="std metrics_option" id="metricsprop-scyllaalternator-batch-item-count-histogram">
+<dt class="sig sig-object std" id="metrics_option-scyllaalternator_batch_item_count_histogram">
+<span class="sig-name descname"><span class="pre">scyllaalternator_batch_item_count_histogram</span></span><a class="headerlink" href="#metrics_option-scyllaalternator_batch_item_count_histogram" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Histogram of the number of items in a batch request</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">histogram</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">alternator</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">batch_item_count_histogram</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
 </section>
 <section id="client">
 <h2>Client<a class="headerlink" href="#client" title="Link to this heading">¶</a></h2>
@@ -3818,6 +3851,24 @@
 </section>
 <section id="standard-role-manager">
 <h2>Standard role manager<a class="headerlink" href="#standard-role-manager" title="Link to this heading">¶</a></h2>
+</section>
+<section id="corrupt-data-handler">
+<h2>Corrupt data handler<a class="headerlink" href="#corrupt-data-handler" title="Link to this heading">¶</a></h2>
+<dl class="std metrics_option" id="metricsprop-scyllacorrupt-data-entries-reported">
+<dt class="sig sig-object std" id="metrics_option-scyllacorrupt_data_entries_reported">
+<span class="sig-name descname"><span class="pre">scyllacorrupt_data_entries_reported</span></span><a class="headerlink" href="#metrics_option-scyllacorrupt_data_entries_reported" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Counts the number of corrupt data instances reported to the corrupt data handler. A non-zero value indicates that the database suffered data corruption.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">corrupt_data</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">entries_reported</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
 </section>
 <section id="trace-keyspace-helper">
 <h2>Trace keyspace helper<a class="headerlink" href="#trace-keyspace-helper" title="Link to this heading">¶</a></h2>
@@ -4024,7 +4075,7 @@
             const themeGithubRepository = true;
             let message = 'Great! Thanks for your feedback.';
             if (themeGithubRepository && !liked) {
-                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Metrics&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2025.1/reference/metrics%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
+                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Metrics&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2025.2/reference/metrics%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
             }
             feedbackMessage.innerHTML = message;
         }
@@ -4093,7 +4144,7 @@
     
     <ul class="contribute">
         <li class="contribute__item">
-            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Metrics&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2025.1/reference/metrics%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
+            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Metrics&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2025.2/reference/metrics%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
                target="_blank">
                 <i class="icon-github" aria-hidden="true"></i>Create an issue
             </a>
@@ -4125,6 +4176,7 @@
 <li><a class="reference internal" href="#types">Types</a></li>
 <li><a class="reference internal" href="#data-dictionary">Data dictionary</a></li>
 <li><a class="reference internal" href="#repair">Repair</a></li>
+<li><a class="reference internal" href="#compress">Compress</a></li>
 <li><a class="reference internal" href="#row-cache">Row cache</a></li>
 <li><a class="reference internal" href="#mapreduce-service">Mapreduce service</a></li>
 <li><a class="reference internal" href="#sstables">Sstables</a></li>
@@ -4142,6 +4194,7 @@
 <li><a class="reference internal" href="#stats">Stats</a></li>
 <li><a class="reference internal" href="#client">Client</a></li>
 <li><a class="reference internal" href="#standard-role-manager">Standard role manager</a></li>
+<li><a class="reference internal" href="#corrupt-data-handler">Corrupt data handler</a></li>
 <li><a class="reference internal" href="#trace-keyspace-helper">Trace keyspace helper</a></li>
 <li><a class="reference internal" href="#describe-statement">Describe statement</a></li>
 <li><a class="reference internal" href="#stream-session">Stream session</a></li>
@@ -4180,7 +4233,7 @@
     <li class="scylla-dropdown__item">
         <a class="scylla-dropdown__title" href="#">
             
-                2025.1
+                2025.2
             
             <i class="chevron icon-docs-chevron-right"></i>
         </a>
@@ -4194,13 +4247,19 @@
             
                 
                     <li>
-                        <a href="../../branch-2025.2/reference/metrics.html">2025.2</a>
+                        <a href="../../branch-2025.3/reference/metrics.html">2025.3</a>
                     </li>
                 
             
                 
                     <li>
-                        <a href="metrics.html">2025.1</a>
+                        <a href="metrics.html">2025.2</a>
+                    </li>
+                
+            
+                
+                    <li>
+                        <a href="../../branch-2025.1/reference/metrics.html">2025.1</a>
                     </li>
                 
             
@@ -4592,7 +4651,7 @@
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 01 Jul 2025.
+                        Last updated on 02 Jul 2025.
                     
                 </div>
             
