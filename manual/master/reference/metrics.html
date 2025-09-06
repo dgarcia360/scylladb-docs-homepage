@@ -62,7 +62,7 @@
             
         
             
-                <link rel="stylesheet" type="text/css" href="../_static/css/main.css?v=8b3d47d3" />
+                <link rel="stylesheet" type="text/css" href="../_static/css/main.css?v=e3ce25dc" />
             
         
             
@@ -189,10 +189,17 @@
     <div class="header-navigation">
         <ul class="dropdown menu scylla-dropdown scylla-dropdown--header" data-dropdown-menu>
             <li class="scylla-dropdown__item">
-                <a href="https://docs.scylladb.com/manual/" class="scylla-dropdown__title">Server</a>
-            </li>
-            <li class="scylla-dropdown__item">
-                <a href="https://docs.scylladb.com/scylla-cloud/" class="scylla-dropdown__title">Cloud</a>
+                <a href="#" class="scylla-dropdown__title">Deployments <i class="chevron icon-arrow-dropdown"></i></a>
+                <ul class="menu scylla-dropdown__content">
+                    <li>
+                        <a href="https://docs.scylladb.com/scylla-cloud/">
+                            <i class="icon-docs-cloud"></i>Cloud</a>
+                    </li>
+                    <li>
+                        <a href="https://docs.scylladb.com/manual/">
+                            <i class="icon-server"></i>Server</a>
+                    </li>
+                </ul>
             </li>
             <li class="scylla-dropdown__item">
                 <a href="#" class="scylla-dropdown__title">Tools <i class="chevron icon-arrow-dropdown"></i></a>
@@ -254,7 +261,7 @@
             </li>
         </ul>
         <div class="header-button">
-            <a href="https://www.scylladb.com/download/" class="button"><i class="icon-download me-2"></i> Download</a>
+            <a href="https://docs.scylladb.com/manual/stable/getting-started/installation-common/scylla-web-installer.html" class="button"><i class="icon-download me-2"></i> Install</a>
         </div>
     </div>
     <div class="header-search-box">
@@ -262,6 +269,15 @@
         <div class="search-box">
             <ci-search></ci-search>
         </div>
+        
+            <biel-button class="header-ask-ai" project="ddfdo8m94k" 
+                header-title="ScyllaDB chatbot (beta)"
+                button-position="default"
+                modal-position="bottom-right"
+                button-style="dark">
+                Ask AI
+            </biel-button>
+        
     </div>
     <div class="side-nav-toggle">
     <i class="dark-theme-toggler icon-theme"></i>
@@ -2210,6 +2226,24 @@
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
 <li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">raft</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">apply_index</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+</section>
+<section id="sstables-manager">
+<h2>Sstables manager<a class="headerlink" href="#sstables-manager" title="Link to this heading">¶</a></h2>
+<dl class="std metrics_option" id="metricsprop-scyllas3-memory-usage">
+<dt class="sig sig-object std" id="metrics_option-scyllas3_memory_usage">
+<span class="sig-name descname"><span class="pre">scyllas3_memory_usage</span></span><a class="headerlink" href="#metrics_option-scyllas3_memory_usage" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Total number of bytes consumed by S3 client</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">s3</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">memory_usage</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
@@ -4183,6 +4217,7 @@
 <li><a class="reference internal" href="#tablet-allocator">Tablet allocator</a></li>
 <li><a class="reference internal" href="#ttl">Ttl</a></li>
 <li><a class="reference internal" href="#server">Server</a></li>
+<li><a class="reference internal" href="#sstables-manager">Sstables manager</a></li>
 <li><a class="reference internal" href="#wasm-instance-cache">Wasm instance cache</a></li>
 <li><a class="reference internal" href="#storage-service">Storage service</a></li>
 <li><a class="reference internal" href="#service">Service</a></li>
@@ -4673,19 +4708,19 @@
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 05 Sep 2025.
+                        Last updated on 06 Sep 2025.
                     
                 </div>
             
             <div class="footer-bottom__version">
                 Powered by
                 <a class="footer-bottom__link" href="http://sphinx-doc.org/">Sphinx 7.4.7</a> &amp;
-                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.7</a>
+                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.8</a>
             </div>
         </div>
     </div>
     
-        <biel-button project="ddfdo8m94k" 
+        <biel-button class="footer-ask-ai" project="ddfdo8m94k" 
             header-title="ScyllaDB chatbot (beta)"
             button-position="bottom-right"
             modal-position="bottom-right"
