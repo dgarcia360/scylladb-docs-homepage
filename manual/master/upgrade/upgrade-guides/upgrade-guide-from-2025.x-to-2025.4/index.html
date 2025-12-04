@@ -10,7 +10,7 @@
         <meta name="viewport" content="width=device-width initial-scale=1" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>
-             Upgrade - ScyllaDB 2025.2 to ScyllaDB 2025.3 | ScyllaDB Docs 
+             Upgrade - ScyllaDB 2025.x to ScyllaDB 2025.4 | ScyllaDB Docs 
         </title>
         <meta name="description" content="ScyllaDB is an Apache Cassandra-compatible NoSQL data store that can handle 1 million transactions per second on a single server." />
         <link rel="icon" href="../../../_static/img/favicon.ico" type="image/x-icon" />
@@ -25,7 +25,7 @@
 
         
             
-            <link rel="canonical" href="https://docs.scylladb.com/manual/stable/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/"/>
+            <link rel="canonical" href="https://docs.scylladb.com/manual/stable/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2025.4/"/>
         
 
         <link rel="author" href="mailto:info@scylladb.com" />
@@ -51,17 +51,17 @@
         </noscript>
 
         
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.css">
-        <script type="module" src="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.esm.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.css">
+            <script type="module" src="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.esm.js"></script>
         
-        
-        
-            
-                <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
-            
+
         
             
-                <link rel="stylesheet" type="text/css" href="../../../_static/css/main.css?v=e3ce25dc" />
+                <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=03e43079" />
+            
+        
+            
+                <link rel="stylesheet" type="text/css" href="../../../_static/css/main.css?v=3e5a588f" />
             
         
             
@@ -166,10 +166,12 @@
     <body class="brand-self-hosted">
         <section class="promo-banner  promo-banner--hide" style="display: none;">
     <div class="promo-banner-wrapper">
-        
-        <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
-        <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
-           target="_blank" rel="noopener noreferrer">Register for Free</a>
+        <div class="promo-banner__content">
+            
+            <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
+            <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
+               target="_blank" rel="noopener noreferrer">Register for Free</a>
+        </div>
         <button class="promo-banner__close">
             <i class="icon-cancel"></i>
         </button>
@@ -223,14 +225,20 @@
                 <a href="#" class="scylla-dropdown__title">Drivers <i class="chevron icon-arrow-dropdown"></i></a>
                 <ul class="menu scylla-dropdown__content">
                     <li>
-                        <a href="https://docs.scylladb.com/manual/stable/using-scylla/drivers/cql-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/cql-drivers">
                             <i class="icon-docs-nsql-guides"></i>CQL Drivers
                         </a>
                     </li>
                     <li>
-                        <a href="https://docs.scylladb.com/manual/stable/using-scylla/drivers/dynamo-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/dynamo-drivers">
                             <i class="icon-docs-alternator"></i>DynamoDB Drivers
                         </a>
+
+                        <li>
+                            <a href="https://docs.scylladb.com/stable/versioning/driver-support">
+                                <i class="icon-docs-blog"></i>Supported Driver Versions
+                            </a>
+                        </li>
                     </li>
                 </ul>
             </li>
@@ -269,11 +277,11 @@
             <ci-search></ci-search>
         </div>
         
-            <biel-button class="header-ask-ai" project="ddfdo8m94k" 
-                header-title="ScyllaDB chatbot (beta)"
-                button-position="default"
-                modal-position="bottom-right"
-                button-style="dark">
+            <biel-button class="header-ask-ai" project="ddfdo8m94k"
+                         header-title="ScyllaDB chatbot (beta)"
+                         button-position="default"
+                         modal-position="bottom-right"
+                         button-style="dark">
                 Ask AI
             </biel-button>
         
@@ -323,36 +331,36 @@
             </a>
         </span>
     
-    <span class="bread__item bread__item--last">Upgrade - ScyllaDB 2025.2 to ScyllaDB 2025.3</span>
+    <span class="bread__item bread__item--last">Upgrade - ScyllaDB 2025.x to ScyllaDB 2025.4</span>
 </div>
                     </div>
                 
                 
-                <div class="sidebar-right-layout">
-                    <div class="body-container">
+                    <div class="sidebar-right-layout">
+                        <div class="body-container">
                 
 
-                    <div class="content-body">
+                <div class="content-body">
+                    
                         
-                            
     
 
-                        
-                        
-                        <section id="upgrade-scylladb-2025-2-to-scylladb-2025-3">
-<h1>Upgrade - ScyllaDB 2025.2 to ScyllaDB 2025.3<a class="headerlink" href="#upgrade-scylladb-2025-2-to-scylladb-2025-3" title="Link to this heading">¶</a></h1>
+                    
+
+                    <section id="upgrade-scylladb-2025-x-to-scylladb-2025-4">
+<h1>Upgrade - ScyllaDB 2025.x to ScyllaDB 2025.4<a class="headerlink" href="#upgrade-scylladb-2025-x-to-scylladb-2025-4" title="Link to this heading">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <ul class="simple">
-<li><p><a class="reference internal" href="upgrade-guide-from-2025.2-to-2025.3.html"><span class="doc">Upgrade from ScyllaDB 2025.2.x to ScyllaDB 2025.3.y</span></a></p></li>
-<li><p><a class="reference internal" href="metric-update-2025.2-to-2025.3.html"><span class="doc">Metrics Update Between 2025.2 and 2025.3</span></a></p></li>
+<li><p><a class="reference internal" href="upgrade-guide-from-2025.x-to-2025.4.html"><span class="doc">Upgrade from ScyllaDB 2025.x to ScyllaDB 2025.4</span></a></p></li>
+<li><p><a class="reference internal" href="metric-update-2025.x-to-2025.4.html"><span class="doc">Metrics Update Between 2025.x and 2025.4</span></a></p></li>
 </ul>
 </section>
 
-                    </div>
-                    
-                        <div class="post-content">
-                            
+                </div>
+                
+                    <div class="post-content">
+                        
     <div class="feedback-container">
         <p class="feedback-container__title">Was this page helpful?</p>
         <span data-tooltip tabindex="1" title="Yes" data-position="top">
@@ -381,7 +389,7 @@
             const themeGithubRepository = true;
             let message = 'Great! Thanks for your feedback.';
             if (themeGithubRepository && !liked) {
-                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade - ScyllaDB 2025.2 to ScyllaDB 2025.3&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/master/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/index%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
+                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade - ScyllaDB 2025.x to ScyllaDB 2025.4&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/master/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2025.4/index%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
             }
             feedbackMessage.innerHTML = message;
         }
@@ -413,7 +421,7 @@
         });
     </script>
 
-                            <div class="content-navigation">
+                        <div class="content-navigation">
     <div class="navigation navigation--prev">
         
             <a class="navigation__link" href="../index.html">
@@ -428,9 +436,9 @@
     </div>
     <div class="navigation navigation--next">
         
-            <a class="navigation__link" href="upgrade-guide-from-2025.2-to-2025.3.html">
+            <a class="navigation__link" href="upgrade-guide-from-2025.x-to-2025.4.html">
                 <div class="navigation__title">
-                    <span class="colored">NEXT</span> <br />Upgrade from ScyllaDB 2025.2 to ScyllaDB 2025.3
+                    <span class="colored">NEXT</span> <br />Upgrade from ScyllaDB 2025.x to ScyllaDB 2025.4
                 </div>
                 <button class="navigation__button">
                     <i class="icon-chevron-right"></i>
@@ -439,25 +447,25 @@
         
     </div>
 </div>
-                            <!-- Post content text -->
-                        </div>
-                    
+                        <!-- Post content text -->
+                    </div>
                 
+
                 
                     </div>
-                        <div class="sidebar-right large-order-3">
-                            <div class="secondary-side-nav custom-scroll-bar">
+                    <div class="sidebar-right large-order-3">
+                        <div class="secondary-side-nav custom-scroll-bar">
     
     <ul class="contribute">
         <li class="contribute__item">
-            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade - ScyllaDB 2025.2 to ScyllaDB 2025.3&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/master/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/index%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
+            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade - ScyllaDB 2025.x to ScyllaDB 2025.4&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/master/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2025.4/index%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
                target="_blank">
                 <i class="icon-github" aria-hidden="true"></i>Create an issue
             </a>
         </li>
         
             <li class="contribute__item">
-                <a class="button button-sm" href="https://github.com/scylladb/scylladb/edit/master/docs/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/index.rst"
+                <a class="button button-sm" href="https://github.com/scylladb/scylladb/edit/master/docs/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2025.4/index.rst"
                    target="_blank">
                     <i class="icon-edit" aria-hidden="true"></i>Edit this page
                 </a>
@@ -467,7 +475,7 @@
 
     
 </div>
-                        </div>
+                    </div>
                     </div>
                 
             </div>
@@ -505,13 +513,13 @@
             
                 
                     <li>
-                        <a href="../../../../branch-2025.4/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/index.html">2025.4</a>
+                        <a href="../../../../branch-2025.4/index.html">2025.4</a>
                     </li>
                 
             
                 
                     <li>
-                        <a href="../../../../stable/upgrade/upgrade-guides/upgrade-guide-from-2025.2-to-2025.3/index.html">2025.3</a>
+                        <a href="../../../../stable/index.html">2025.3</a>
                     </li>
                 
             
@@ -892,7 +900,7 @@
                     
                 
             </div>
-            
+
         </section>
 
         <footer class="footer">
@@ -904,7 +912,7 @@
                 <a class="footer-links__link" href="https://docs.scylladb.com/stable/get-started/develop-with-scylladb/tutorials-example-projects.html" target="_blank">Tutorials</a>
                 <a class="footer-links__link" href="https://university.scylladb.com/" target="_blank">University</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/contact-us/"
-                    target="_blank">Contact Us</a>
+                   target="_blank">Contact Us</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/" target="_blank">About Us</a>
             </div>
             <div class="footer-actions">
@@ -922,40 +930,40 @@
         </div>
 
         
-        <div class="footer-copyright">
-            
+            <div class="footer-copyright">
                 
-                    &#169; 2025, ScyllaDB. All rights reserved.
+                    
+                        &#169; 2025, ScyllaDB. All rights reserved.
+                    
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/tos/" target="_blank">Terms of Service</a>
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/privacy/" target="_blank">Privacy Policy</a>
+                    | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.
                 
-                | <a class="footer-copyright__link" href="https://www.scylladb.com/tos/" target="_blank">Terms of Service</a>
-                | <a class="footer-copyright__link" href="https://www.scylladb.com/privacy/" target="_blank">Privacy Policy</a>
-                | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.
-            
-        </div>
-    
+            </div>
+        
 
 
         <div class="footer-bottom">
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 25 Nov 2025.
+                        Last updated on 04 Dec 2025.
                     
                 </div>
             
             <div class="footer-bottom__version">
                 Powered by
                 <a class="footer-bottom__link" href="http://sphinx-doc.org/">Sphinx 7.4.7</a> &amp;
-                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.8</a>
+                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.9</a>
             </div>
         </div>
     </div>
     
-        <biel-button class="footer-ask-ai" project="ddfdo8m94k" 
-            header-title="ScyllaDB chatbot (beta)"
-            button-position="bottom-right"
-            modal-position="bottom-right"
-            button-style="dark">
+        <biel-button class="footer-ask-ai" project="ddfdo8m94k"
+                     header-title="ScyllaDB chatbot (beta)"
+                     button-position="bottom-right"
+                     modal-position="bottom-right"
+                     button-style="dark">
             Ask AI
         </biel-button>
     

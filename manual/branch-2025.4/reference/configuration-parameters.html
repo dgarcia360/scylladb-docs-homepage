@@ -52,17 +52,17 @@
         </noscript>
 
         
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.css">
-        <script type="module" src="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.esm.js"></script>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.css">
+            <script type="module" src="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.esm.js"></script>
         
-        
-        
-            
-                <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-            
+
         
             
-                <link rel="stylesheet" type="text/css" href="../_static/css/main.css?v=e3ce25dc" />
+                <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+            
+        
+            
+                <link rel="stylesheet" type="text/css" href="../_static/css/main.css?v=3e5a588f" />
             
         
             
@@ -167,10 +167,12 @@
     <body class="brand-self-hosted">
         <section class="promo-banner  promo-banner--hide" style="display: none;">
     <div class="promo-banner-wrapper">
-        
-        <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
-        <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
-           target="_blank" rel="noopener noreferrer">Register for Free</a>
+        <div class="promo-banner__content">
+            
+            <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
+            <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
+               target="_blank" rel="noopener noreferrer">Register for Free</a>
+        </div>
         <button class="promo-banner__close">
             <i class="icon-cancel"></i>
         </button>
@@ -224,14 +226,20 @@
                 <a href="#" class="scylla-dropdown__title">Drivers <i class="chevron icon-arrow-dropdown"></i></a>
                 <ul class="menu scylla-dropdown__content">
                     <li>
-                        <a href="https://docs.scylladb.com/manual/stable/using-scylla/drivers/cql-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/cql-drivers">
                             <i class="icon-docs-nsql-guides"></i>CQL Drivers
                         </a>
                     </li>
                     <li>
-                        <a href="https://docs.scylladb.com/manual/stable/using-scylla/drivers/dynamo-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/dynamo-drivers">
                             <i class="icon-docs-alternator"></i>DynamoDB Drivers
                         </a>
+
+                        <li>
+                            <a href="https://docs.scylladb.com/stable/versioning/driver-support">
+                                <i class="icon-docs-blog"></i>Supported Driver Versions
+                            </a>
+                        </li>
                     </li>
                 </ul>
             </li>
@@ -270,11 +278,11 @@
             <ci-search></ci-search>
         </div>
         
-            <biel-button class="header-ask-ai" project="ddfdo8m94k" 
-                header-title="ScyllaDB chatbot (beta)"
-                button-position="default"
-                modal-position="bottom-right"
-                button-style="dark">
+            <biel-button class="header-ask-ai" project="ddfdo8m94k"
+                         header-title="ScyllaDB chatbot (beta)"
+                         button-position="default"
+                         modal-position="bottom-right"
+                         button-style="dark">
                 Ask AI
             </biel-button>
         
@@ -317,13 +325,13 @@
                     </div>
                 
                 
-                <div class="sidebar-right-layout">
-                    <div class="body-container">
+                    <div class="sidebar-right-layout">
+                        <div class="body-container">
                 
 
-                    <div class="content-body">
+                <div class="content-body">
+                    
                         
-                            
     <div class="admonition caution">
         <p class="admonition-title">Caution</p>
         <p>
@@ -334,9 +342,9 @@
         </p>
     </div>
 
-                        
-                        
-                        <section id="configuration-parameters">
+                    
+
+                    <section id="configuration-parameters">
 <h1>Configuration Parameters<a class="headerlink" href="#configuration-parameters" title="Link to this heading">¶</a></h1>
 <p>This section contains a list of properties that can be configured in <code class="docutils literal notranslate"><span class="pre">scylla.yaml</span></code> - the main configuration file for ScyllaDB.
 In addition, properties that support live updates (liveness) can be updated via the <code class="docutils literal notranslate"><span class="pre">system.config</span></code> virtual table or the <a class="reference internal" href="../operating-scylla/rest.html"><span class="doc">REST API</span></a>.</p>
@@ -470,7 +478,7 @@ The change will take effect without a node restart, changing the value in the co
 <dt class="sig sig-object std" id="confval-workdir-W">
 <span class="sig-name descname"><span class="pre">workdir,W</span></span><a class="headerlink" href="#confval-workdir-W" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
-<div><p>The directory in which Scylla will put all its subdirectories. The location of individual subdirs can be overridden by the respective <code class="docutils literal notranslate"><span class="pre">*_directory</span></code> options.</p>
+<div><p>The directory in which Scylla will put all its subdirectories. The location of individual subdirs can be overridden by the respective ``*_directory`` options.</p>
 <ul class="simple">
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">&quot;/var/lib/scylla&quot;</span></code></p></li>
 <li><p><span data-tooltip data-tooltip-height="0" tabindex="1" title="The ability to update a configuration property without restarting the node. Properties that support live updates can be updated via the system.config virtual table or the REST API.
@@ -806,7 +814,7 @@ The change will take effect without a node restart, changing the value in the co
 <span class="sig-name descname"><span class="pre">direct_failure_detector_ping_timeout_in_ms</span></span><a class="headerlink" href="#confval-direct_failure_detector_ping_timeout_in_ms" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><dl class="simple">
-<dt>Duration after which the direct failure detector aborts a ping message, so the next ping can start.</dt><dd><p>Note: this failure detector is used by Raft, and is different from gossiper’s failure detector (configured by <cite>failure_detector_timeout_in_ms</cite>).</p>
+<dt>Duration after which the direct failure detector aborts a ping message, so the next ping can start.</dt><dd><p>Note: this failure detector is used by Raft, and is different from gossiper’s failure detector (configured by `failure_detector_timeout_in_ms`).</p>
 </dd>
 </dl>
 <ul class="simple">
@@ -828,7 +836,7 @@ The change will take effect without a node restart, changing the value in the co
 <div><dl>
 <dt>The method that Scylla uses to acknowledge writes in milliseconds:</dt><dd><ul class="simple">
 <li><p>periodic: Used with commitlog_sync_period_in_ms (Default: 10000 - 10 seconds ) to control how often the commit log is synchronized to disk. Periodic syncs are acknowledged immediately.</p></li>
-<li><p>batch: Used with commitlog_sync_batch_window_in_ms (Default: disabled <code class="docutils literal notranslate"><span class="pre">**</span></code>) to control how long Scylla waits for other writes before performing a sync. When using this method, writes are not acknowledged until fsynced to disk.</p></li>
+<li><p>batch: Used with commitlog_sync_batch_window_in_ms (Default: disabled ``**``) to control how long Scylla waits for other writes before performing a sync. When using this method, writes are not acknowledged until fsynced to disk.</p></li>
 </ul>
 <p>Related information: Durability</p>
 </dd>
@@ -880,7 +888,7 @@ The change will take effect without a node restart, changing the value in the co
 <dt class="sig sig-object std" id="confval-commitlog_sync_period_in_ms">
 <span class="sig-name descname"><span class="pre">commitlog_sync_period_in_ms</span></span><a class="headerlink" href="#confval-commitlog_sync_period_in_ms" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
-<div><p>Controls how long the system waits for other writes before performing a sync in <code class="docutils literal notranslate"><span class="pre">periodic</span></code> mode.</p>
+<div><p>Controls how long the system waits for other writes before performing a sync in ``periodic`` mode.</p>
 <ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code></p></li>
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">10000</span></code></p></li>
@@ -894,7 +902,7 @@ The change will take effect without a node restart, changing the value in the co
 <dt class="sig sig-object std" id="confval-commitlog_sync_batch_window_in_ms">
 <span class="sig-name descname"><span class="pre">commitlog_sync_batch_window_in_ms</span></span><a class="headerlink" href="#confval-commitlog_sync_batch_window_in_ms" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
-<div><p>Controls how long the system waits for other writes before performing a sync in <code class="docutils literal notranslate"><span class="pre">batch</span></code> mode.</p>
+<div><p>Controls how long the system waits for other writes before performing a sync in ``batch`` mode.</p>
 <ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">uint32_t</span></code></p></li>
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">10000</span></code></p></li>
@@ -1598,9 +1606,9 @@ The change will take effect without a node restart, changing the value in the co
 <dd><blockquote>
 <div><dl>
 <dt>Specifies when RPC compression dictionary training is performed by this node.</dt><dd><ul class="simple">
-<li><p><cite>never</cite> disables it unconditionally.</p></li>
-<li><p><cite>when_leader</cite> enables it only whenever the node is the Raft leader.</p></li>
-<li><p><cite>always</cite> (not recommended) enables it unconditionally.</p></li>
+<li><p>`never` disables it unconditionally.</p></li>
+<li><p>`when_leader` enables it only whenever the node is the Raft leader.</p></li>
+<li><p>`always` (not recommended) enables it unconditionally.</p></li>
 </ul>
 <p>Training shouldn’t be enabled on more than one node at a time, because overly-frequent dictionary announcements might indefinitely delay nodes from agreeing on a new dictionary.</p>
 </dd>
@@ -3215,7 +3223,7 @@ The change will take effect without a node restart, changing the value in the co
 <dt class="sig sig-object std" id="confval-enable_user_defined_functions">
 <span class="sig-name descname"><span class="pre">enable_user_defined_functions</span></span><a class="headerlink" href="#confval-enable_user_defined_functions" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
-<div><p>Enable user defined functions. You must also set <code class="docutils literal notranslate"><span class="pre">experimental-features=udf</span></code>.</p>
+<div><p>Enable user defined functions. You must also set ``experimental-features=udf``.</p>
 <ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">false</span></code></p></li>
@@ -3346,13 +3354,13 @@ The change will take effect without a node restart, changing the value in the co
 This option controls the behavior when someone tries to create a view with such invalid IS NOT NULL restrictions.</p>
 <dl class="simple">
 <dt>Can be true, false, or warn:</dt><dd><ul class="simple">
-<li><p><cite>true</cite>: IS NOT NULL is allowed only on the view’s primary key columns,     trying to use it on other columns will cause an error, as it should.</p></li>
-<li><p><cite>false</cite>: Scylla accepts IS NOT NULL restrictions on regular columns, but they’re silently ignored.     It’s useful for backwards compatibility.</p></li>
-<li><p><cite>warn</cite>: The same as false, but there’s a warning about invalid view restrictions.</p></li>
+<li><p>`true`: IS NOT NULL is allowed only on the view’s primary key columns,     trying to use it on other columns will cause an error, as it should.</p></li>
+<li><p>`false`: Scylla accepts IS NOT NULL restrictions on regular columns, but they’re silently ignored.     It’s useful for backwards compatibility.</p></li>
+<li><p>`warn`: The same as false, but there’s a warning about invalid view restrictions.</p></li>
 </ul>
 </dd>
 </dl>
-<p>To preserve backwards compatibility on old clusters, Scylla’s default setting is <cite>warn</cite>.     New clusters have this option set to <cite>true</cite> by scylla.yaml (which overrides the default <cite>warn</cite>),     to make sure that trying to create an invalid view causes an error.</p>
+<p>To preserve backwards compatibility on old clusters, Scylla’s default setting is `warn`.     New clusters have this option set to `true` by scylla.yaml (which overrides the default `warn`),     to make sure that trying to create an invalid view causes an error.</p>
 </dd>
 </dl>
 <ul class="simple">
@@ -3762,7 +3770,7 @@ The change will take effect without a node restart, changing the value in the co
 <dt class="sig sig-object std" id="confval-cache_index_pages">
 <span class="sig-name descname"><span class="pre">cache_index_pages</span></span><a class="headerlink" href="#confval-cache_index_pages" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
-<div><p>Keep SSTable index pages in the global cache after a SSTable read. Expected to improve performance for workloads with big partitions, but may degrade performance for workloads with small partitions. The amount of memory usable by index cache is limited with <code class="docutils literal notranslate"><span class="pre">index_cache_fraction</span></code>.</p>
+<div><p>Keep SSTable index pages in the global cache after a SSTable read. Expected to improve performance for workloads with big partitions, but may degrade performance for workloads with small partitions. The amount of memory usable by index cache is limited with ``index_cache_fraction``.</p>
 <ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">bool</span></code></p></li>
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">true</span></code></p></li>
@@ -4311,14 +4319,14 @@ The change will take effect without a node restart, changing the value in the co
 <div><p>Control tablets for new keyspaces.  Can be set to the following values:</p>
 <blockquote>
 <div><p>disabled: New keyspaces use vnodes by default, unless enabled by the tablets={‘enabled’:true} option</p>
-<p>enabled:  New keyspaces use tablets by default, unless disabled by the tablets={‘disabled’:true} option</p>
+<p>enabled:  New keyspaces use tablets by default, unless disabled by the tablets={‘enabled’:false} option</p>
 <p>enforced: New keyspaces must use tablets. Tablets cannot be disabled using the CREATE KEYSPACE option</p>
 </div></blockquote>
 <ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">enum_option&lt;tablets_mode_t&gt;</span></code></p></li>
 <li><p><strong>Default value:</strong> <code class="docutils literal notranslate"><span class="pre">tablets_mode_t::mode::unset</span></code></p></li>
 <li><p><span data-tooltip data-tooltip-height="0" tabindex="1" title="The ability to update a configuration property without restarting the node. Properties that support live updates can be updated via the system.config virtual table or the REST API.
-The change will take effect without a node restart, changing the value in the config file, then sending SIGHUP to the scylla-process, triggering it to re-read its configuration." class="top">Liveness</span>: <code class="docutils literal notranslate"><span class="pre">False</span></code></p></li>
+The change will take effect without a node restart, changing the value in the config file, then sending SIGHUP to the scylla-process, triggering it to re-read its configuration." class="top">Liveness</span>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
@@ -4494,10 +4502,10 @@ The change will take effect without a node restart, changing the value in the co
 </section>
 </section>
 
-                    </div>
-                    
-                        <div class="post-content">
-                            
+                </div>
+                
+                    <div class="post-content">
+                        
     <div class="feedback-container">
         <p class="feedback-container__title">Was this page helpful?</p>
         <span data-tooltip tabindex="1" title="Yes" data-position="top">
@@ -4558,7 +4566,7 @@ The change will take effect without a node restart, changing the value in the co
         });
     </script>
 
-                            <div class="content-navigation">
+                        <div class="content-navigation">
     <div class="navigation navigation--prev">
         
             <a class="navigation__link" href="gcp-images.html">
@@ -4584,14 +4592,14 @@ The change will take effect without a node restart, changing the value in the co
         
     </div>
 </div>
-                            <!-- Post content text -->
-                        </div>
-                    
+                        <!-- Post content text -->
+                    </div>
                 
+
                 
                     </div>
-                        <div class="sidebar-right large-order-3">
-                            <div class="secondary-side-nav custom-scroll-bar">
+                    <div class="sidebar-right large-order-3">
+                        <div class="secondary-side-nav custom-scroll-bar">
     
     <ul class="contribute">
         <li class="contribute__item">
@@ -4642,7 +4650,7 @@ The change will take effect without a node restart, changing the value in the co
         </div>
     
 </div>
-                        </div>
+                    </div>
                     </div>
                 
             </div>
@@ -5067,7 +5075,7 @@ The change will take effect without a node restart, changing the value in the co
                     
                 
             </div>
-            
+
         </section>
 
         <footer class="footer">
@@ -5079,7 +5087,7 @@ The change will take effect without a node restart, changing the value in the co
                 <a class="footer-links__link" href="https://docs.scylladb.com/stable/get-started/develop-with-scylladb/tutorials-example-projects.html" target="_blank">Tutorials</a>
                 <a class="footer-links__link" href="https://university.scylladb.com/" target="_blank">University</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/contact-us/"
-                    target="_blank">Contact Us</a>
+                   target="_blank">Contact Us</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/" target="_blank">About Us</a>
             </div>
             <div class="footer-actions">
@@ -5097,40 +5105,40 @@ The change will take effect without a node restart, changing the value in the co
         </div>
 
         
-        <div class="footer-copyright">
-            
+            <div class="footer-copyright">
                 
-                    &#169; 2025, ScyllaDB. All rights reserved.
+                    
+                        &#169; 2025, ScyllaDB. All rights reserved.
+                    
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/tos/" target="_blank">Terms of Service</a>
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/privacy/" target="_blank">Privacy Policy</a>
+                    | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.
                 
-                | <a class="footer-copyright__link" href="https://www.scylladb.com/tos/" target="_blank">Terms of Service</a>
-                | <a class="footer-copyright__link" href="https://www.scylladb.com/privacy/" target="_blank">Privacy Policy</a>
-                | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.
-            
-        </div>
-    
+            </div>
+        
 
 
         <div class="footer-bottom">
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 25 Nov 2025.
+                        Last updated on 04 Dec 2025.
                     
                 </div>
             
             <div class="footer-bottom__version">
                 Powered by
                 <a class="footer-bottom__link" href="http://sphinx-doc.org/">Sphinx 7.4.7</a> &amp;
-                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.8</a>
+                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.9</a>
             </div>
         </div>
     </div>
     
-        <biel-button class="footer-ask-ai" project="ddfdo8m94k" 
-            header-title="ScyllaDB chatbot (beta)"
-            button-position="bottom-right"
-            modal-position="bottom-right"
-            button-style="dark">
+        <biel-button class="footer-ask-ai" project="ddfdo8m94k"
+                     header-title="ScyllaDB chatbot (beta)"
+                     button-position="bottom-right"
+                     modal-position="bottom-right"
+                     button-style="dark">
             Ask AI
         </biel-button>
     
