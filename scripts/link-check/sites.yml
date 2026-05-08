@@ -79,9 +79,11 @@ sites:
     slug: csharp-driver
     url: https://csharp-driver.docs.scylladb.com/stable/sitemap.xml
 
-  - name: Node.js Driver
-    slug: nodejs-driver
-    url: https://nodejs-rs-driver.docs.scylladb.com/stable/sitemap.xml
+  # Node.js Driver: 200+ broken links per run; needs cleanup in the driver
+  # docs first. Re-add once that lands.
+  # - name: Node.js Driver
+  #   slug: nodejs-driver
+  #   url: https://nodejs-rs-driver.docs.scylladb.com/stable/sitemap.xml
 
   # Tutorials
   - name: CarePet Tutorial
