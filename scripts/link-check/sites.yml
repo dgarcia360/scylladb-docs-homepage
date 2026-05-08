@@ -27,13 +27,8 @@ sites:
     slug: sphinx-theme
     url: https://sphinx-theme.scylladb.com/stable/sitemap.xml
 
-  # ScyllaDB Developers is temporarily excluded. Its Sphinx config has
-  # `html_baseurl` set without a scheme, so both the sitemap entries and
-  # the per-page `<link rel="canonical">` come out scheme-less, which makes
-  # lychee report ~40 false positives per run. Re-add this entry once
-  # `html_baseurl` is fixed to `https://developers.scylladb.com/` in
-  # scylladb-docs-developers' conf.py.
-  #
+  # ScyllaDB Developers: ~40 false positives per run; needs `html_baseurl`
+  # fixed in scylladb-docs-developers' conf.py. Re-add once that ships.
   # - name: ScyllaDB Developers
   #   slug: developers
   #   url: https://developers.scylladb.com/stable/sitemap.xml
