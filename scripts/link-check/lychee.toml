@@ -22,12 +22,11 @@ accept = [
 include_mail = false
 exclude_loopback = true
 
-# Skip known-flaky external services. Listing them here avoids noisy reports
-# without losing signal on the docs themselves.
+# Localhost-style URLs that should never appear in published docs. lychee's
+# `exclude_loopback` covers 127.0.0.0/8 but not the all-zeros address, and
+# these tend to leak in from local dev preview URLs.
 exclude = [
-  # University LMS times out under bot load even though the pages work in a
-  # browser. Not part of the docs ecosystem we maintain.
-  "^https?://university\\.scylladb\\.com/",
+  "^https?://0\\.0\\.0\\.0",
 ]
 
 # Identify ourselves so server admins can contact us if needed.
