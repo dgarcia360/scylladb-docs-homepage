@@ -22,11 +22,15 @@ accept = [
 include_mail = false
 exclude_loopback = true
 
-# Localhost-style URLs that should never appear in published docs. lychee's
-# `exclude_loopback` covers 127.0.0.0/8 but not the all-zeros address, and
-# these tend to leak in from local dev preview URLs.
 exclude = [
+  # Localhost dev preview URLs. lychee's `exclude_loopback` covers
+  # 127.0.0.0/8 but not the all-zeros address.
   "^https?://0\\.0\\.0\\.0",
+
+  # Cloudflare bot protection in front of WP Engine returns 504 to GitHub
+  # Actions IPs even though pages load fine in a browser. Excluding for now;
+  # revisit if the host moves off Cloudflare or relaxes its bot rules.
+  "^https?://university\\.scylladb\\.com/",
 ]
 
 # Identify ourselves so server admins can contact us if needed.
