@@ -31,6 +31,16 @@ def fetch(url, timeout=30):
         return resp.read()
 
 
+def _normalize(url):
+    """Some sitemaps emit scheme-less URLs (e.g. `developers.scylladb.com/...`).
+    Prepend `https://` so lychee crawls the right host over TLS instead of
+    defaulting to plain HTTP."""
+    url = url.strip()
+    if url and not url.startswith(("http://", "https://")):
+        return "https://" + url
+    return url
+
+
 def expand_sitemap(url):
     """Return all page URLs in a sitemap, recursing into sitemap indexes."""
     root = ET.fromstring(fetch(url))
@@ -38,11 +48,11 @@ def expand_sitemap(url):
     if tag == "sitemapindex":
         urls = []
         for loc in root.findall("sm:sitemap/sm:loc", SITEMAP_NS):
-            urls.extend(expand_sitemap(loc.text.strip()))
+            urls.extend(expand_sitemap(_normalize(loc.text)))
         return urls
     if tag == "urlset":
         return [
-            loc.text.strip()
+            _normalize(loc.text)
             for loc in root.findall("sm:url/sm:loc", SITEMAP_NS)
         ]
     print(f"warning: unrecognized sitemap root <{tag}> at {url}", file=sys.stderr)

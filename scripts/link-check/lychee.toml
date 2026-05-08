@@ -22,5 +22,13 @@ accept = [
 include_mail = false
 exclude_loopback = true
 
+# Skip known-flaky external services. Listing them here avoids noisy reports
+# without losing signal on the docs themselves.
+exclude = [
+  # University LMS times out under bot load even though the pages work in a
+  # browser. Not part of the docs ecosystem we maintain.
+  "^https?://university\\.scylladb\\.com/",
+]
+
 # Identify ourselves so server admins can contact us if needed.
 user_agent = "scylladb-docs-link-check (+https://github.com/scylladb/scylladb-docs-homepage)"
