@@ -68,11 +68,12 @@ jobs:
         with:
           args: >-
             --config scripts/link-check/lychee.toml
-            --format json
-            --output scripts/link-check/lychee-report.json
             --no-progress
             --files-from scripts/link-check/urls.txt
+          format: json
+          output: scripts/link-check/lychee-report.json
           fail: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Fetch open issues for this site
         env:
