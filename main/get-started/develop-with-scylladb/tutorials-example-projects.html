@@ -26,17 +26,15 @@
 
         
             
-            <link rel="canonical" href="https://dgarcia360.github.io/scylladb-docs-homepage/stable/get-started/develop-with-scylladb/tutorials-example-projects.html"/>
+            <link rel="canonical" href="https://docs.scylladb.com/stable/get-started/develop-with-scylladb/tutorials-example-projects.html"/>
         
 
         <link rel="author" href="mailto:info@scylladb.com" />
 
         
             
-        <!-- increase expertrec loading priority-->
-        <link rel="dns-prefetch" href="https://cse.expertrec.com">
+        
 
-        <!-- increase font loading priority -->
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link rel="preload" as="style"
               href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" />
@@ -50,13 +48,19 @@
             <link rel="stylesheet"
                   href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,400&display=swap" />
         </noscript>
+
+        
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.css">
+            <script type="module" src="https://cdn.jsdelivr.net/npm/biel-search@latest/dist/biel-search/biel-search.esm.js"></script>
+        
+
         
             
-                <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+                <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
             
         
             
-                <link rel="stylesheet" type="text/css" href="../../_static/css/main.css?v=a77d7859" />
+                <link rel="stylesheet" type="text/css" href="../../_static/css/main.css?v=041c0933" />
             
         
             
@@ -68,7 +72,7 @@
             
         
             
-                <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=7ca11290" />
+                <link rel="stylesheet" type="text/css" href="../../_static/css/custom.css?v=756716cd" />
             
         
     
@@ -83,11 +87,11 @@
             
         
             
-                <script src="../../_static/doctools.js?v=9a2dae69"></script>
+                <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
             
         
             
-                <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+                <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
             
         
             
@@ -140,27 +144,21 @@
 <!-- End Google Tag Manager -->
 
 <!-- Expertrec -->
-<script>
-    var id = "e2077224-9ccf-11e9-a0c9-0242ac130002";
-    var ci_search = document.createElement("script");
-    ci_search.type = "text/javascript";
-    ci_search.async = true;
-    ci_search.src = "https://cse.expertrec.com/api/js/ci_common.js?id=" + id;
-    var s = document.getElementsByTagName("script")[0];
-    s.parentNode.insertBefore(ci_search, s);
-</script>
+
 <!-- End Expertrec -->
             
         
     </head>
 
-    <body>
+    <body class="brand-product">
         <section class="promo-banner  promo-banner--hide" style="display: none;">
     <div class="promo-banner-wrapper">
-        
-        <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
-        <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
-           target="_blank" rel="noopener noreferrer">Register for Free</a>
+        <div class="promo-banner__content">
+            
+            <div class="promo-banner__title">ScyllaDB University LIVE, FREE Virtual Training Event | March 21</div>
+            <a class="promo-banner__button button button--reverse" href="https://lp.scylladb.com/university-live-2023-03-registration?siteplacement=docs"
+               target="_blank" rel="noopener noreferrer">Register for Free</a>
+        </div>
         <button class="promo-banner__close">
             <i class="icon-cancel"></i>
         </button>
@@ -179,30 +177,17 @@
     <div class="header-navigation">
         <ul class="dropdown menu scylla-dropdown scylla-dropdown--header" data-dropdown-menu>
             <li class="scylla-dropdown__item">
-                <a href="#" class="scylla-dropdown__title">Server
-                    <i class="chevron icon-arrow-dropdown"></i></a>
+                <a href="#" class="scylla-dropdown__title">Deployments <i class="chevron icon-arrow-dropdown"></i></a>
                 <ul class="menu scylla-dropdown__content">
                     <li>
-                        <a href="https://opensource.docs.scylladb.com/">
-                            <i class="icon-docs-open-source"></i>
-                            ScyllaDB Open Source
-                        </a>
+                        <a href="https://docs.scylladb.com/scylla-cloud/">
+                            <i class="icon-docs-cloud"></i>Cloud</a>
                     </li>
                     <li>
-                        <a href="https://enterprise.docs.scylladb.com/">
-                            <i class="icon-docs-enterprise"></i>ScyllaDB Enterprise
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://scylla.docs.scylladb.com/stable/alternator/alternator.html">
-                            <i class="icon-docs-alternator"></i>
-                            ScyllaDB Alternator
-                        </a>
+                        <a href="https://docs.scylladb.com/manual/">
+                            <i class="icon-server"></i>Server</a>
                     </li>
                 </ul>
-            </li>
-            <li class="scylla-dropdown__item">
-                <a href="https://docs.scylladb.com/scylla-cloud/" class="scylla-dropdown__title">Cloud</a>
             </li>
             <li class="scylla-dropdown__item">
                 <a href="#" class="scylla-dropdown__title">Tools <i class="chevron icon-arrow-dropdown"></i></a>
@@ -227,27 +212,73 @@
                 <a href="#" class="scylla-dropdown__title">Drivers <i class="chevron icon-arrow-dropdown"></i></a>
                 <ul class="menu scylla-dropdown__content">
                     <li>
-                        <a href="https://docs.scylladb.com/using-scylla/drivers/cql-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/cql-drivers">
                             <i class="icon-docs-nsql-guides"></i>CQL Drivers
                         </a>
                     </li>
                     <li>
-                        <a href="https://docs.scylladb.com/using-scylla/drivers/dynamo-drivers/">
+                        <a href="https://docs.scylladb.com/stable/drivers/dynamo-drivers">
                             <i class="icon-docs-alternator"></i>DynamoDB Drivers
+                        </a>
+
+                        <li>
+                            <a href="https://docs.scylladb.com/stable/versioning/driver-support">
+                                <i class="icon-docs-blog"></i>Supported Driver Versions
+                            </a>
+                        </li>
+                    </li>
+                </ul>
+            </li>
+            <li class="scylla-dropdown__item">
+                <a href="#" class="scylla-dropdown__title">Resources
+                    <i class="chevron icon-arrow-dropdown"></i></a>
+                <ul class="menu scylla-dropdown__content">
+                    <li>
+                        <a href="https://university.scylladb.com">
+                            <i class="icon-university"></i>
+                            ScyllaDB University
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://forum.scylladb.com">
+                            <i class="icon-docs-community"></i>
+                            Community Forum
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://docs.scylladb.com/stable/get-started/develop-with-scylladb/tutorials-example-projects.html">
+                            <i class="icon-docs-training"></i>
+                            Tutorials
                         </a>
                     </li>
                 </ul>
             </li>
         </ul>
         <div class="header-button">
-            <a href="https://www.scylladb.com/download/" class="button">Download</a>
+            <a href="https://docs.scylladb.com/manual/stable/getting-started/install-scylla/index.html" class="button"><i class="icon-download me-2"></i> Install</a>
         </div>
     </div>
     <div class="header-search-box">
         <i class="dark-theme-toggler icon-theme"></i>
-        <div class="search-box">
-            <ci-search></ci-search>
-        </div>
+        
+            <biel-search-button
+                project="ddfdo8m94k"
+                button-style="rounded"
+                hide-filters="false"
+                header-title="ScyllaDB chatbot (beta)"
+                modal-position="top-center">
+                Search
+            </biel-search-button>
+            
+                <biel-button class="header-ask-ai" project="ddfdo8m94k"
+                             header-title="ScyllaDB chatbot (beta)"
+                             button-position="default"
+                             modal-position="sidebar-right"
+                             button-style="dark">
+                    Ask AI
+                </biel-button>
+            
+        
     </div>
     <div class="side-nav-toggle">
     <i class="dark-theme-toggler icon-theme"></i>
@@ -256,12 +287,10 @@
     </div>
 </div>
 </header>
+        <div class="title"></div>
         <section
             class="layout  layout--sidebar layout--has-secondary-sidebar ">
             <div class="content large-order-2">
-                
-                    
-                
                 
                     <div class="pre-content">
                         <div class="breadcrumbs">
@@ -294,7 +323,20 @@
 </div>
                     </div>
                 
-                <section id="tutorials-and-example-projects">
+                
+                    <div class="sidebar-right-layout">
+                        <div class="body-container">
+                
+
+                <div class="content-body"
+                     
+                         data-view-source-url="https://github.com/scylladb/scylladb-docs-homepage/blob/main/docs/get-started/develop-with-scylladb/tutorials-example-projects.rst"
+                     >
+                    
+                        
+                    
+
+                    <section id="tutorials-and-example-projects">
 <h1>Tutorials and Example Projects<a class="headerlink" href="#tutorials-and-example-projects" title="Link to this heading">¶</a></h1>
 <p>The tutorials and example project will help you learn how to use ScyllaDB
 as a data source for an application.</p>
@@ -306,11 +348,12 @@ ScyllaDB Cloud.</p>
 <p>It includes examples for NodeJS, Java, Python, Rust, Ruby, Elixir, C#, and
 Go.</p>
 </section>
-<section id="gaming-leaderboard">
-<h2>Gaming Leaderboard<a class="headerlink" href="#gaming-leaderboard" title="Link to this heading">¶</a></h2>
-<p>The <a class="reference external" href="https://github.com/scylladb/gaming-leaderboard-demo">Gaming Leaderboard sample application</a>
-will guide you through the process of creating a leaderboard for your gaming
-application using ScyllaDB Cloud and NextJS.</p>
+<section id="vector-search">
+<h2>Vector Search<a class="headerlink" href="#vector-search" title="Link to this heading">¶</a></h2>
+<p>With the <a class="reference external" href="https://vector-search.scylladb.com/">Vector Search sample application tutorial</a>,
+you’ll learn how you can use ScyllaDB Vector Search to build RAG applications,
+semantic caching layers, and how it works together with popular LLM libraries
+like LlamaIndex and LangChain.</p>
 </section>
 <section id="video-streaming">
 <h2>Video Streaming<a class="headerlink" href="#video-streaming" title="Link to this heading">¶</a></h2>
@@ -336,6 +379,7 @@ the shopping cart API server.</p>
 </section>
 </section>
 
+                </div>
                 
                     <div class="post-content">
                         
@@ -367,7 +411,7 @@ the shopping cart API server.</p>
             const themeGithubRepository = true;
             let message = 'Great! Thanks for your feedback.';
             if (themeGithubRepository && !liked) {
-                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb-docs-homepage/issues/new?title=docs:%20Issue on page Tutorials and Example Projects&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://dgarcia360.github.io/scylladb-docs-homepage/main/get-started/develop-with-scylladb/tutorials-example-projects%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
+                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb-docs-homepage/issues/new?title=docs:%20Issue on page Tutorials and Example Projects&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/main/get-started/develop-with-scylladb/tutorials-example-projects%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
             }
             feedbackMessage.innerHTML = message;
         }
@@ -428,79 +472,22 @@ the shopping cart API server.</p>
                         <!-- Post content text -->
                     </div>
                 
-            </div>
-            <div class="sidebar-left  large-order-1">
-                
-                    
-                        <div id="side-nav" class="side-nav custom-scroll-bar" data-closable data-toggler=".show">
-    <button class="collapsible-button">
-        <i class="icon-docs-menu-collapse"></i>
-    </button>
-    <div class="side-nav-content" style="visibility: hidden;">
-        <div class="side-nav__search">
-            <div class="search-box">
-                <ci-search></ci-search>
-            </div>
-        </div>
-        <div class="side-nav__title">
-            <a href="../../index.html">ScyllaDB Documentation</a>
-        </div>
-        <div class="side-nav__versions"></div>
-        <div class="side-nav__content">
-            <ul class="current">
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Get Started with ScyllaDB</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon-arrow-dropdown"></i></label><div class="break"></div><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../why-scylladb/index.html">Why ScyllaDB?</a></li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Develop with ScyllaDB</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon-arrow-dropdown"></i></label><div class="break"></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="run-scylladb.html">Run ScyllaDB</a></li>
-<li class="toctree-l3"><a class="reference internal" href="install-drivers.html">Install a Driver</a></li>
-<li class="toctree-l3"><a class="reference internal" href="connect-apps.html">Connect an Application</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Tutorials and Example Projects</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../query-data/index.html">Query Data</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon-arrow-dropdown"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/cql.html">CQL</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/schema.html">Schema</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/insert-data.html">Inserting Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/read-data.html">Reading Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/update-data.html">Updating Data</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../query-data/delete-data.html">Deleting Data</a></li>
-</ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../data-modeling/index.html">Data Modeling</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label for="toctree-checkbox-4"><i class="icon-arrow-dropdown"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../data-modeling/query-design.html">Query Design</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data-modeling/schema-design.html">Schema Design</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../data-modeling/best-practices.html">Data Modeling Best Practices</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../learn-resources/index.html">Learn to Use ScyllaDB</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../../versioning/index.html">Versioning and Support Policy</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label for="toctree-checkbox-5"><i class="icon-arrow-dropdown"></i></label><div class="break"></div><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../versioning/version-support-enterprise.html">ScyllaDB Enterprise Version Support</a></li>
-</ul>
-</li>
-</ul>
 
-        </div>
-    </div>
-</div>
-                    
                 
-            </div>
-            
-                <div class="sidebar-right large-order-3">
-                    <div class="secondary-side-nav custom-scroll-bar">
+                    </div>
+                    <div class="sidebar-right large-order-3">
+                        <div class="secondary-side-nav custom-scroll-bar">
     
     <ul class="contribute">
         <li class="contribute__item">
-            <a href="https://github.com/scylladb/scylladb-docs-homepage/issues/new?title=docs:%20Issue on page Tutorials and Example Projects&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://dgarcia360.github.io/scylladb-docs-homepage/main/get-started/develop-with-scylladb/tutorials-example-projects%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
+            <a class="button button-sm" href="https://github.com/scylladb/scylladb-docs-homepage/issues/new?title=docs:%20Issue on page Tutorials and Example Projects&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/main/get-started/develop-with-scylladb/tutorials-example-projects%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
                target="_blank">
                 <i class="icon-github" aria-hidden="true"></i>Create an issue
             </a>
         </li>
         
             <li class="contribute__item">
-                <a href="https://github.com/scylladb/scylladb-docs-homepage/edit/main/docs/get-started/develop-with-scylladb/tutorials-example-projects.rst"
+                <a class="button button-sm" href="https://github.com/scylladb/scylladb-docs-homepage/edit/main/docs/get-started/develop-with-scylladb/tutorials-example-projects.rst"
                    target="_blank">
                     <i class="icon-edit" aria-hidden="true"></i>Edit this page
                 </a>
@@ -514,7 +501,7 @@ the shopping cart API server.</p>
             <ul>
 <li><a class="reference internal" href="#">Tutorials and Example Projects</a><ul>
 <li><a class="reference internal" href="#getting-started-with-scylladb-cloud">Getting Started with ScyllaDB Cloud</a></li>
-<li><a class="reference internal" href="#gaming-leaderboard">Gaming Leaderboard</a></li>
+<li><a class="reference internal" href="#vector-search">Vector Search</a></li>
 <li><a class="reference internal" href="#video-streaming">Video Streaming</a></li>
 <li><a class="reference internal" href="#care-pet-project">Care Pet Project</a></li>
 <li><a class="reference internal" href="#ml-feature-store">ML Feature Store</a></li>
@@ -526,8 +513,95 @@ the shopping cart API server.</p>
         </div>
     
 </div>
-                </div>
+                    </div>
+                    </div>
+                
+            </div>
+            <div class="sidebar-left  large-order-1">
+                
+                    
+                        <div id="side-nav" class="side-nav custom-scroll-bar" data-closable data-toggler=".show">
+    <button class="collapsible-button">
+        <i class="icon-docs-menu-collapse"></i>
+    </button>
+    <div class="side-nav-content custom-scroll-bar">
+        <div class="side-nav__title">
+            <a href="../../index.html">ScyllaDB Documentation</a>
+        </div>
+        <div class="side-nav__search">
             
+                <biel-search-button
+                    project="ddfdo8m94k"
+                    button-style="rounded"
+                    hide-filters="false"
+                    hide-ctrl-k="true"
+                    header-title="ScyllaDB chatbot (beta)"
+                    modal-position="top-center">
+                    Search
+                </biel-search-button>
+                
+                    <biel-button class="side-nav__ask-ai" project="ddfdo8m94k"
+                                 header-title="ScyllaDB chatbot (beta)"
+                                 button-position="default"
+                                 modal-position="sidebar-right"
+                                 button-style="dark">
+                        Ask AI
+                    </biel-button>
+                
+            
+        </div>
+        <div class="side-nav__versions"></div>
+        <div class="side-nav__content">
+            <ul class="current">
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../index.html">Get Started with ScyllaDB</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../scylladb-basics.html">New to ScyllaDB? Start here!</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="index.html">Develop with ScyllaDB</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="run-scylladb.html">Run ScyllaDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="install-drivers.html">Install a Driver</a></li>
+<li class="toctree-l3"><a class="reference internal" href="connect-apps.html">Connect an Application</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">Tutorials and Example Projects</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../query-data/index.html">Query Data</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/cql.html">CQL</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/schema.html">Schema</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/insert-data.html">Inserting Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/read-data.html">Reading Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/update-data.html">Updating Data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../query-data/delete-data.html">Deleting Data</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../data-modeling/index.html">Data Modeling</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label for="toctree-checkbox-4"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../data-modeling/query-design.html">Query Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data-modeling/schema-design.html">Schema Design</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../data-modeling/best-practices.html">Data Modeling Best Practices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../learn-resources/index.html">Learn to Use ScyllaDB</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../drivers/index.html">ScyllaDB Drivers</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label for="toctree-checkbox-5"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../drivers/cql-drivers.html">ScyllaDB CQL Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../drivers/dynamo-drivers.html">ScyllaDB DynamoDB Drivers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../drivers/third-party-drivers.html">Third-party Drivers</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../versioning/index.html">Versioning and Support Policy</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label for="toctree-checkbox-6"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../versioning/version-support.html">ScyllaDB Version Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../versioning/driver-support.html">Driver Support</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../versioning/os-support-per-version.html">OS Support per ScyllaDB Version</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../versioning/upgrade-policy.html">Upgrade Policy</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+    </div>
+</div>
+                    
+                
+            </div>
+
         </section>
 
         <footer class="footer">
@@ -536,9 +610,10 @@ the shopping cart API server.</p>
             <a class="footer-logo" href="https://www.scylladb.com"></a>
             <div class="footer-links">
                 <a class="footer-links__link" href="https://docs.scylladb.com/" target="_blank">Docs</a>
+                <a class="footer-links__link" href="https://docs.scylladb.com/stable/get-started/develop-with-scylladb/tutorials-example-projects.html" target="_blank">Tutorials</a>
                 <a class="footer-links__link" href="https://university.scylladb.com/" target="_blank">University</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/contact-us/"
-                    target="_blank">Contact Us</a>
+                   target="_blank">Contact Us</a>
                 <a class="footer-links__link" href="https://www.scylladb.com/company/" target="_blank">About Us</a>
             </div>
             <div class="footer-actions">
@@ -555,27 +630,32 @@ the shopping cart API server.</p>
             </div>
         </div>
 
+        
+            <div class="footer-copyright">
+                
+                    
+                        &#169; 2026, ScyllaDB. All rights reserved.
+                    
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/tos/" target="_blank">Terms of Service</a>
+                    | <a class="footer-copyright__link" href="https://www.scylladb.com/privacy/" target="_blank">Privacy Policy</a>
+                    | ScyllaDB, and ScyllaDB Cloud, are registered trademarks of ScyllaDB, Inc.
+                
+            </div>
+        
+
+
         <div class="footer-bottom">
-            
-                <div class="footer-bottom__copyright">
-                    
-                        
-                            &#169; 2025, ScyllaDB. All rights reserved.
-                        
-                    
-                </div>
-            
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 14 Jan 2025.
+                        Last updated on 08 May 2026.
                     
                 </div>
             
             <div class="footer-bottom__version">
                 Powered by
-                <a href="http://sphinx-doc.org/">Sphinx 7.4.7</a> &amp;
-                <a href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.8.3</a>
+                <a class="footer-bottom__link" href="http://sphinx-doc.org/">Sphinx 9.1.0</a> &amp;
+                <a class="footer-bottom__link" href="https://sphinx-theme.scylladb.com/">ScyllaDB Theme 1.9.2</a>
             </div>
         </div>
     </div>
