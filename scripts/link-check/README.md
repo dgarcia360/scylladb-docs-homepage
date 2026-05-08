@@ -83,6 +83,11 @@ the same site, a separate issue is opened.
 
 Actions tab → **Docs / Link check** → **Run workflow** on `main`.
 
+The dispatch dialog has an optional **slug** input. Leave it blank to run every site (same as the weekly schedule),
+or enter a single slug from `sites.yml` (e.g. `python-driver`) to run just that one site. Useful when you've fixed
+something on one docs site and want to confirm before next Monday. Unknown slugs fail the matrix-build job with a
+list of valid slugs.
+
 ### Run a single site locally
 
 Useful for testing a config tweak before pushing.
@@ -152,6 +157,8 @@ These are produced at runtime and ignored via `.gitignore`:
 - `issue-body.md`: rendered body of the new issue
 
 For full lychee tuning options, see the [lychee configuration reference][lychee-config].
+
+[lychee-config]: https://github.com/lycheeverse/lychee/blob/master/lychee.example.toml
 
 ### Labels
 

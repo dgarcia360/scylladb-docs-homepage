@@ -5,6 +5,12 @@ on:
     # Mondays at 08:00 UTC.
     - cron: "0 8 * * 1"
   workflow_dispatch:
+    inputs:
+      slug:
+        description: "Run only the site with this slug (e.g. `python-driver`). Leave empty to run every site."
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -27,9 +33,13 @@ jobs:
 
       - name: Read sites.yml
         id: read
+        env:
+          REQUESTED_SLUG: ${{ inputs.slug }}
         run: |
           python - <<'PY' >> "$GITHUB_OUTPUT"
           import json
+          import os
+          import sys
           import yaml
           with open("scripts/link-check/sites.yml") as f:
               cfg = yaml.safe_load(f)
@@ -37,6 +47,17 @@ jobs:
               {"name": s["name"], "slug": s["slug"], "url": s["url"]}
               for s in cfg["sites"]
           ]
+          slug = os.environ.get("REQUESTED_SLUG", "").strip()
+          if slug:
+              filtered = [s for s in sites if s["slug"] == slug]
+              if not filtered:
+                  valid = ", ".join(sorted(s["slug"] for s in sites))
+                  print(
+                      f"::error::Unknown slug '{slug}'. Valid slugs: {valid}",
+                      file=sys.stderr,
+                  )
+                  sys.exit(1)
+              sites = filtered
           print("sites=" + json.dumps(sites))
           PY
 
