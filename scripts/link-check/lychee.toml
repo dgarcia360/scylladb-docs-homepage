@@ -22,11 +22,18 @@ accept = [
 include_mail = false
 exclude_loopback = true
 
-# Localhost-style URLs that should never appear in published docs. lychee's
-# `exclude_loopback` covers 127.0.0.0/8 but not the all-zeros address, and
-# these tend to leak in from local dev preview URLs.
 exclude = [
+  # Localhost dev preview URLs. lychee's `exclude_loopback` covers
+  # 127.0.0.0/8 but not the all-zeros address, so we add it here.
   "^https?://0\\.0\\.0\\.0",
+
+  # Workaround for a Sphinx config bug on developers.scylladb.com: every page
+  # emits `<link rel="canonical" href="developers.scylladb.com/..."/>` (no
+  # scheme), which lychee resolves as a relative URL, producing a 404 like
+  # `.../<page-dir>/developers.scylladb.com/<page-path>`. The real fix is to
+  # set `html_baseurl = "https://developers.scylladb.com/"` in that repo's
+  # conf.py; remove this entry once that ships.
+  "^https?://developers\\.scylladb\\.com/.+/developers\\.scylladb\\.com/",
 ]
 
 # Identify ourselves so server admins can contact us if needed.
