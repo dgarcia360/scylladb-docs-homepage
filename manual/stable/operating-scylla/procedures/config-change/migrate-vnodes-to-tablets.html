@@ -10,7 +10,7 @@
         <meta name="viewport" content="width=device-width initial-scale=1" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <title>
-             Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1 | ScyllaDB Docs 
+             Migrate a Keyspace from Vnodes to Tablets Experimental | ScyllaDB Docs 
         </title>
         <meta name="description" content="ScyllaDB is an Apache Cassandra-compatible NoSQL data store that can handle 1 million transactions per second on a single server." />
         <link rel="icon" href="../../../_static/img/favicon.ico" type="image/x-icon" />
@@ -26,7 +26,7 @@
 
         
             
-            <link rel="canonical" href="https://docs.scylladb.com/manual/stable/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2026.1/upgrade-guide-from-2025.x-to-2026.1.html"/>
+            <link rel="canonical" href="https://docs.scylladb.com/manual/stable/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets.html"/>
         
 
         <link rel="author" href="mailto:info@scylladb.com" />
@@ -316,30 +316,24 @@
     </span>
     
         <span class="bread__item">
-            <a href="../../../operating-scylla/index.html" class="bread__highlight">
+            <a href="../../index.html" class="bread__highlight">
                 ScyllaDB for Administrators
             </a>
         </span>
     
         <span class="bread__item">
-            <a href="../../index.html" class="bread__highlight">
-                Upgrade ScyllaDB
-            </a>
-        </span>
-    
-        <span class="bread__item">
             <a href="../index.html" class="bread__highlight">
-                Upgrade ScyllaDB
+                Procedures
             </a>
         </span>
     
         <span class="bread__item">
             <a href="index.html" class="bread__highlight">
-                Upgrade - ScyllaDB 2025.x to ScyllaDB 2026.1
+                ScyllaDB Configuration Procedures
             </a>
         </span>
     
-    <span class="bread__item bread__item--last">Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1</span>
+    <span class="bread__item bread__item--last">Migrate a Keyspace from Vnodes to Tablets <span class="label label--caution">Experimental</span></span>
 </div>
                     </div>
                 
@@ -350,344 +344,402 @@
 
                 <div class="content-body"
                      
-                         data-view-source-url="https://github.com/scylladb/scylladb/blob/master/docs/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2026.1/upgrade-guide-from-2025.x-to-2026.1.rst"
+                         data-view-source-url="https://github.com/scylladb/scylladb/blob/master/docs/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets.rst"
                      >
                     
                         
-    
-
                     
 
-                    <section id="upgrade-from-scylla-name-src-version-to-scylla-name-new-version">
-<h1>Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1<a class="headerlink" href="#upgrade-from-scylla-name-src-version-to-scylla-name-new-version" title="Link to this heading">¶</a></h1>
-<p>This document describes a step-by-step procedure for upgrading from ScyllaDB 2025.x
-to ScyllaDB 2026.1 and rollback to version 2025.x if necessary.</p>
-<p>This guide covers upgrading ScyllaDB on Red Hat Enterprise Linux (RHEL), CentOS, Debian,
-and Ubuntu.
-See <a class="reference external" href="https://docs.scylladb.com/stable/versioning/os-support-per-version.html">OS Support by Platform and Version</a>
-for information about supported versions. It also applies when using
-the ScyllaDB official image on EC2, GCP, or Azure.</p>
-<p>See <a class="reference internal" href="../../about-upgrade.html"><span class="doc">About Upgrade</span></a> for the ScyllaDB upgrade policy.</p>
-<section id="before-you-upgrade-scylladb">
-<h2>Before You Upgrade ScyllaDB<a class="headerlink" href="#before-you-upgrade-scylladb" title="Link to this heading">¶</a></h2>
-<p><strong>Upgrade Your Driver</strong></p>
-<p>If you’re using a <a class="reference external" href="https://docs.scylladb.com/stable/drivers/index.html">ScyllaDB driver</a>,
-upgrade the driver before upgrading ScyllaDB. The latest two versions of each driver
-are supported. See <a class="reference external" href="https://docs.scylladb.com/stable/versioning/driver-support.html">Driver Support</a>.</p>
-<p><strong>Upgrade ScyllaDB Monitoring Stack</strong></p>
-<p>If you’re using the ScyllaDB Monitoring Stack, verify that your Monitoring Stack
-version supports the ScyllaDB version to which you want to upgrade. See
-<a class="reference external" href="https://monitoring.docs.scylladb.com/stable/reference/matrix.html">ScyllaDB Monitoring Stack Support Matrix</a>.</p>
-<p>We recommend upgrading the Monitoring Stack to the latest version.</p>
-<p><strong>Check Feature Updates</strong></p>
-<p>See the ScyllaDB Release Notes for the latest updates. The Release Notes are published
-at the <a class="reference external" href="https://forum.scylladb.com/c/scylladb-release-notes/">ScyllaDB Community Forum</a>.</p>
-</section>
-<section id="upgrade-procedure">
-<h2>Upgrade Procedure<a class="headerlink" href="#upgrade-procedure" title="Link to this heading">¶</a></h2>
-<p>A ScyllaDB upgrade is a rolling procedure that does <strong>not</strong> require full cluster shutdown.
-For each of the nodes in the cluster, serially (i.e., one node at a time), you will:</p>
+                    <section id="migrate-a-keyspace-from-vnodes-to-tablets-experimental">
+<h1>Migrate a Keyspace from Vnodes to Tablets <span class="label label--caution">Experimental</span><a class="headerlink" href="#migrate-a-keyspace-from-vnodes-to-tablets-experimental" title="Link to this heading">¶</a></h1>
+<p>This procedure describes how to migrate an existing keyspace from vnodes
+to tablets. Tablets are designed to be the long-term replacement for vnodes,
+offering numerous benefits such as faster topology operations, automatic load
+balancing, automatic cleanups, and improved streaming performance. Migrating to
+tablets is strongly recommended. See <a class="reference internal" href="../../../architecture/tablets.html"><span class="doc">Data Distribution with Tablets</span></a>
+for details.</p>
+<p>ℹ️ This feature is experimental and will change in future releases, including
+the removal of current limitations.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The migration is an online operation. This means that the keyspace remains
+fully available to users throughout the migration, provided that its
+replication factor is greater than 1. Reads and writes continue to be served
+using vnodes until the migration is finished.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>During the migration, you should expect degraded performance on the migrating
+keyspace. The reasons are the following:</p>
 <ul class="simple">
-<li><p>Check that the cluster’s schema is synchronized</p></li>
-<li><p>Drain the node and backup the data</p></li>
-<li><p>Backup the configuration file</p></li>
-<li><p>Stop ScyllaDB</p></li>
-<li><p>Download and install new ScyllaDB packages</p></li>
-<li><p>Start ScyllaDB</p></li>
-<li><p>Validate that the upgrade was successful</p></li>
+<li><p><strong>Rolling restart</strong>: Each node must upgrade its storage from vnodes to
+tablets. This is an offline operation happening on startup, so a restart is
+needed. Upon restart, each node performs a heavy and time-consuming
+resharding operation to reorganize its data based on tablets, and remains
+offline until this operation completes. Resharding may last from minutes to
+hours, depending on the amount of data that the node holds. At this time,
+the node cannot serve any requests.</p></li>
+<li><p><strong>Unbalanced tablets</strong>: The initial tablet layout mirrors the vnode layout.
+The tablet load balancer does not rebalance tablets until the migration is
+finished, so some shards may carry more data than others during the
+migration. The imbalance is expected to be more prominent in clusters with
+very large nodes (hundreds of vCPUs).</p></li>
+<li><p><strong>Loss of shard awareness</strong>: During the migration and until the rolling
+restart is complete, the cluster is in a mixed state with some nodes using
+vnodes and others using tablets. In this state, queries may cause
+cross-shard operations within nodes, reducing performance.</p></li>
 </ul>
+<p>The performance will return to normal after the migration finishes and the
+tablet load balancer rebalances the data.</p>
+</div>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>All nodes in the cluster must be <strong>up and running</strong>. You can check the status
+of all nodes with
+<a class="reference internal" href="../../nodetool-commands/status.html"><span class="doc">nodetool status</span></a>.</p></li>
+<li><p>All nodes must be running ScyllaDB 2026.2 or later.</p></li>
+</ul>
+</section>
+<section id="limitations">
+<h2>Limitations<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
+<p>The current migration procedure has the following limitations:</p>
+<ul class="simple">
+<li><p><strong>No schema changes</strong> during the migration. Do not create, alter, or drop
+tables in the migrating keyspace until the migration is finished.</p></li>
+<li><p><strong>No topology changes</strong> during the migration. Do not add, remove, decommission,
+or replace nodes while a migration is in progress.</p></li>
+<li><p><strong>No TRUNCATE</strong> on tables in the migrating keyspace during the migration.</p></li>
+<li><p>Only <strong>CQL base tables</strong> can be migrated. Materialized views, secondary
+indexes, CDC tables, and Alternator tables are not supported.</p></li>
+<li><p>Tables with <strong>counters</strong> or <strong>LWTs</strong> cannot be migrated.</p></li>
+</ul>
+</section>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>The migration consists of three phases:</p>
+<ol class="arabic simple">
+<li><p><strong>Prepare</strong>: Create tablet maps for all tables in the keyspace. Each tablet
+inherits its token range and replica set from the corresponding vnode range.</p></li>
+<li><p><strong>Storage upgrade</strong>: Restart each node one at a time, upgrading its storage
+from vnodes to tablets. Upon restart, the node begins resharding data into
+tablets. This is a storage-layer operation and is unrelated to ScyllaDB
+version upgrades.</p></li>
+<li><p><strong>Finalize</strong>: Once all nodes have been upgraded, commit the migration by
+clearing the migration state and switching the keyspace schema to tablets.</p></li>
+</ol>
+<p>During the first two phases, the migration is reversible; you can roll back to
+vnodes. However, once the migration is finalized, it cannot be reversed.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the following sections, any reference to “upgrade” or “downgrade” of a
+node will refer to the migration of its storage from vnodes to tablets or
+vice versa. Do not confuse it with version upgrades/downgrades.</p>
+</div>
+</section>
+<section id="procedure">
+<h2>Procedure<a class="headerlink" href="#procedure" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p>Prepare the keyspace for migration:</p>
+<ol class="arabic">
+<li><p>Create tablet maps for all tables in the keyspace:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets start &lt;keyspace&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the keyspace is in <code class="docutils literal notranslate"><span class="pre">migrating_to_tablets</span></code> state and all nodes are still using vnodes:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   uses vnodes</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   uses vnodes</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</li>
+<li id="upgrade-nodes"><p>Upgrade all nodes to tablets:</p>
+<ol class="arabic">
+<li><p>Pick a node.</p></li>
+<li><p>Mark the node for upgrade to tablets:</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This is a node-local operation. Use the IP address of the node that
+you are upgrading.</p>
+</div>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Apply the procedure <strong>serially</strong> on each node. Do not move to the next node before
-validating that the node you upgraded is up and running the new version.</p>
+<p>Do not mark more than one node for upgrade at the same time. Even if
+you restart them serially, unexpected restarts can happen for various
+reasons (crashes, power failures, etc.) leading to parallel node
+upgrades which can reduce availability.</p>
 </div>
-<p><strong>During</strong> the rolling upgrade, it is highly recommended:</p>
-<ul class="simple">
-<li><p>Not to use the new 2026.1 features.</p></li>
-<li><p>Not to run administration functions, such as repairs, refresh, rebuild, or add
-or remove nodes. See <a class="reference external" href="https://manager.docs.scylladb.com/stable/sctool/">sctool</a> for suspending
-ScyllaDB Manager’s scheduled or running repairs.</p></li>
-<li><p>Not to apply schema changes.</p></li>
-</ul>
-</section>
-<section id="upgrade-steps">
-<h2>Upgrade Steps<a class="headerlink" href="#upgrade-steps" title="Link to this heading">¶</a></h2>
-<section id="check-the-cluster-schema">
-<h3>Check the cluster schema<a class="headerlink" href="#check-the-cluster-schema" title="Link to this heading">¶</a></h3>
-<p>Make sure that all nodes have the schema synchronized before the upgrade. The upgrade
-procedure will fail if there is a schema disagreement between nodes.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nodetool<span class="w"> </span>describecluster
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool -h &lt;node-ip&gt; migrate-to-tablets upgrade</span>
 </pre></div>
 </div>
-</section>
-<section id="backup-the-data">
-<h3>Backup the data<a class="headerlink" href="#backup-the-data" title="Link to this heading">¶</a></h3>
-<p>Before any major procedure, like an upgrade, it is recommended to backup all the data
-to an external device.
-We recommend using <a class="reference external" href="https://manager.docs.scylladb.com/stable/backup/index.html">ScyllaDB Manager</a>
-to create backups.</p>
-<p>Alternatively, you can use the <code class="docutils literal notranslate"><span class="pre">nodetool</span> <span class="pre">snapshot</span></code> command.
-For <strong>each</strong> node in the cluster, run the following:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nodetool<span class="w"> </span>drain
-nodetool<span class="w"> </span>snapshot
+</li>
+<li><p>Verify that the node status changed from <code class="docutils literal notranslate"><span class="pre">vnodes</span></code> to <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">tablets</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
 </pre></div>
 </div>
-<p>Take note of the directory name that nodetool gives you, and copy all the directories
-having that name under <code class="docutils literal notranslate"><span class="pre">/var/lib/scylla</span></code> to an external backup device.</p>
-<p>When the upgrade is completed on all nodes, remove the snapshot with the
-<code class="docutils literal notranslate"><span class="pre">nodetool</span> <span class="pre">clearsnapshot</span> <span class="pre">-t</span> <span class="pre">&lt;snapshot&gt;</span></code> command to prevent running out of space.</p>
-</section>
-<section id="backup-the-configuration-file">
-<h3>Backup the configuration file<a class="headerlink" href="#backup-the-configuration-file" title="Link to this heading">¶</a></h3>
-<p>Back up the <code class="docutils literal notranslate"><span class="pre">scylla.yaml</span></code> configuration file and the ScyllaDB packages
-in case you need to rollback the upgrade.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   migrating to tablets  &lt;---</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   uses vnodes</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>Drain and stop the node:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool -h &lt;node-ip&gt; drain</span>
+</pre></div>
+</div>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-RGViaWFuL1VidW50dQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tab" tabindex="0">Debian/Ubuntu</button><button aria-controls="panel-0-UkhFTC9DZW50T1M=" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tab" tabindex="-1">RHEL/CentOS</button></div><div aria-labelledby="tab-0-RGViaWFuL1VidW50dQ==" class="sphinx-tabs-panel group-tab" id="panel-0-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tabpanel" tabindex="0"><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>cp<span class="w"> </span>-a<span class="w"> </span>/etc/scylla/scylla.yaml<span class="w"> </span>/etc/scylla/scylla.yaml.backup
-sudo<span class="w"> </span>cp<span class="w"> </span>/etc/apt/sources.list.d/scylla.list<span class="w"> </span>~/scylla.list-backup
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-0-U3VwcG9ydGVkIE9T" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-0-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tab" tabindex="0">Supported OS</button><button aria-controls="panel-0-RG9ja2Vy" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-0-RG9ja2Vy" name="RG9ja2Vy" role="tab" tabindex="-1">Docker</button></div><div aria-labelledby="tab-0-U3VwcG9ydGVkIE9T" class="sphinx-tabs-panel group-tab" id="panel-0-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>scylla-server
 </pre></div>
 </div>
-</div><div aria-labelledby="tab-0-UkhFTC9DZW50T1M=" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tabpanel" tabindex="0"><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>cp<span class="w"> </span>-a<span class="w"> </span>/etc/scylla/scylla.yaml<span class="w"> </span>/etc/scylla/scylla.yaml.backup
-sudo<span class="w"> </span>cp<span class="w"> </span>/etc/yum.repos.d/scylla.repo<span class="w"> </span>~/scylla.repo-backup
+</div><div aria-labelledby="tab-0-RG9ja2Vy" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-0-RG9ja2Vy" name="RG9ja2Vy" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>some-scylla<span class="w"> </span>supervisorctl<span class="w"> </span>stop<span class="w"> </span>scylla
 </pre></div>
 </div>
+<p>(without stopping <em>some-scylla</em> container)</p>
 </div></div>
-</section>
-<section id="gracefully-stop-the-node">
-<h3>Gracefully stop the node<a class="headerlink" href="#gracefully-stop-the-node" title="Link to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>service<span class="w"> </span>scylla-server<span class="w"> </span>stop
-</pre></div>
-</div>
-</section>
-<section id="download-and-install-the-new-release">
-<h3>Download and install the new release<a class="headerlink" href="#download-and-install-the-new-release" title="Link to this heading">¶</a></h3>
-<p>Before upgrading, check what version you are running now using <code class="docutils literal notranslate"><span class="pre">scylla</span> <span class="pre">--version</span></code>.
-You should take note of the current version in case you want to <a class="reference external" href="./#rollback-procedure">rollback</a> the upgrade.</p>
+</li>
+<li><p>Restart the node:</p>
 <div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-RGViaWFuL1VidW50dQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-1-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tab" tabindex="0">Debian/Ubuntu</button><button aria-controls="panel-1-UkhFTC9DZW50T1M=" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tab" tabindex="-1">RHEL/CentOS</button><button aria-controls="panel-1-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" name="RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" role="tab" tabindex="-1">EC2/GCP/Azure Ubuntu Image</button></div><div aria-labelledby="tab-1-RGViaWFuL1VidW50dQ==" class="sphinx-tabs-panel group-tab" id="panel-1-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Update the ScyllaDB deb repo to 2026.1.</p>
-<blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo wget -O /etc/apt/sources.list.d/scylla.list https://downloads.scylladb.com/deb/debian/scylla-2026.1.list</span>
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-1-U3VwcG9ydGVkIE9T" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-1-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tab" tabindex="0">Supported OS</button><button aria-controls="panel-1-RG9ja2Vy" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-1-RG9ja2Vy" name="RG9ja2Vy" role="tab" tabindex="-1">Docker</button></div><div aria-labelledby="tab-1-U3VwcG9ydGVkIE9T" class="sphinx-tabs-panel group-tab" id="panel-1-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>scylla-server
 </pre></div>
 </div>
-</div></blockquote>
-</li>
-<li><p>Install the new ScyllaDB version:</p>
-<blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt-get clean all</span>
-<span class="go">sudo apt-get update</span>
-<span class="go">sudo apt-get dist-upgrade scylla</span>
+</div><div aria-labelledby="tab-1-RG9ja2Vy" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-RG9ja2Vy" name="RG9ja2Vy" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>some-scylla<span class="w"> </span>supervisorctl<span class="w"> </span>start<span class="w"> </span>scylla
 </pre></div>
 </div>
-</div></blockquote>
+<p>(with <em>some-scylla</em> container already running)</p>
+</div></div>
 </li>
+<li><p>Wait until the node is UP and has returned to the ScyllaDB cluster using <a class="reference internal" href="../../nodetool-commands/status.html"><span class="doc">nodetool status</span></a>.
+This operation may take a long time due to resharding. To monitor
+resharding progress, use the task manager API:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool tasks list compaction -h &lt;node-ip&gt; --keyspace &lt;keyspace&gt; | grep -i reshard</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the node status changed from <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">tablets</span></code> to <code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">tablets</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   uses tablets  &lt;---</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   uses vnodes</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>Move to the next node and repeat from step a until all nodes are upgraded.</p></li>
 </ol>
-<p>Answer ‘y’ to the first two questions.</p>
-</div><div aria-labelledby="tab-1-UkhFTC9DZW50T1M=" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Update the ScyllaDB rpm repo to 2026.1.</p>
-<blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo curl -o /etc/yum.repos.d/scylla.repo -L https://downloads.scylladb.com/rpm/centos/scylla-2026.1.repo</span>
-</pre></div>
-</div>
-</div></blockquote>
 </li>
-<li><p>Install the new ScyllaDB version:</p>
-<blockquote>
-<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>yum<span class="w"> </span>clean<span class="w"> </span>all
-sudo<span class="w"> </span>yum<span class="w"> </span>update<span class="w"> </span>scylla<span class="se">\*</span><span class="w"> </span>-y
-</pre></div>
+<li><p>Finalize the migration:</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Finalization <strong>cannot be undone</strong>. Once the migration is finalized, the
+keyspace cannot be switched back to vnodes.</p>
 </div>
-</div></blockquote>
-</li>
-</ol>
-</div><div aria-labelledby="tab-1-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-1-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" name="RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" role="tabpanel" tabindex="0"><p>If you’re using the ScyllaDB official image (recommended), see the <strong>Debian/Ubuntu</strong>
-tab for upgrade instructions.</p>
-<p>If you’re using your own image and installed ScyllaDB packages for Ubuntu or Debian,
-you need to apply an extended upgrade procedure:</p>
 <ol class="arabic">
-<li><p>Update the ScyllaDB deb repo (see the <strong>Debian/Ubuntu</strong> tab).</p></li>
-<li><p>Install the new ScyllaDB version with the additional <code class="docutils literal notranslate"><span class="pre">scylla-machine-image</span></code> package:</p>
-<blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt-get clean all</span>
-<span class="go">sudo apt-get update</span>
-<span class="go">sudo apt-get dist-upgrade scylla</span>
-<span class="go">sudo apt-get dist-upgrade scylla-machine-image</span>
+<li><p>Issue the finalization request:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets finalize &lt;keyspace&gt;</span>
 </pre></div>
 </div>
-</div></blockquote>
 </li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">scylla_setup</span></code> without <code class="docutils literal notranslate"><span class="pre">running</span> <span class="pre">io_setup</span></code>.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">/opt/scylladb/scylla-machine-image/scylla_cloud_io_setup</span></code>.</p></li>
-</ol>
-</div></div>
-</section>
-<section id="start-the-node">
-<h3>Start the node<a class="headerlink" href="#start-the-node" title="Link to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>service<span class="w"> </span>scylla-server<span class="w"> </span>start
+<li><p>Verify that the keyspace status changed to <code class="docutils literal notranslate"><span class="pre">tablets</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
 </pre></div>
 </div>
-</section>
-<section id="validate">
-<h3>Validate<a class="headerlink" href="#validate" title="Link to this heading">¶</a></h3>
-<ol class="arabic simple">
-<li><p>Check cluster status with <code class="docutils literal notranslate"><span class="pre">nodetool</span> <span class="pre">status</span></code> and make sure <strong>all</strong> nodes, including
-the one you just upgraded, are in <code class="docutils literal notranslate"><span class="pre">UN</span></code> status.</p></li>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">curl</span> <span class="pre">-X</span> <span class="pre">GET</span> <span class="pre">&quot;http://localhost:10000/storage_service/scylla_release_version&quot;</span></code>
-to check the ScyllaDB version. Validate that the version matches the one you upgraded to.</p></li>
-<li><p>Check scylla-server log (by <code class="docutils literal notranslate"><span class="pre">journalctl</span> <span class="pre">_COMM=scylla</span></code>) and <code class="docutils literal notranslate"><span class="pre">/var/log/syslog</span></code> to
-validate there are no new errors in the log.</p></li>
-<li><p>Check again after two minutes to validate no new issues are introduced.</p></li>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>finalize<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: tablets</span>
+</pre></div>
+</div>
+</li>
 </ol>
-<p>Once you are sure the node upgrade was successful, move to the next node in the cluster.</p>
-</section>
+</li>
+</ol>
 </section>
 <section id="rollback-procedure">
 <h2>Rollback Procedure<a class="headerlink" href="#rollback-procedure" title="Link to this heading">¶</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>The rollback procedure can be applied <strong>only</strong> if some nodes have not been
-upgraded to 2026.1 yet. As soon as the last node in the rolling upgrade
-procedure is started with 2026.1, rollback becomes impossible. At that
-point, the only way to restore a cluster to 2025.x is by restoring it
-from backup.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Rollback is only possible <strong>before finalization</strong>. Once the migration is
+finalized, it cannot be reversed.</p>
 </div>
-<p>The following procedure describes a rollback from ScyllaDB 2026.1 to
-2025.x. Apply this procedure if an upgrade from 2025.x to
-2026.1 fails before completing on all nodes.</p>
-<ul class="simple">
-<li><p>Use this procedure only on the nodes you upgraded to 2026.1.</p></li>
-<li><p>Execute the following commands one node at a time, moving to the next node
-only after the rollback procedure is completed successfully.</p></li>
-</ul>
-<p>ScyllaDB rollback is a rolling procedure that does <strong>not</strong> require full cluster shutdown.
-For each of the nodes you rollback to 2025.x, serially (i.e., one node
-at a time), you will:</p>
-<ul class="simple">
-<li><p>Drain the node and stop ScyllaDB</p></li>
-<li><p>Retrieve the old ScyllaDB packages</p></li>
-<li><p>Restore the configuration file</p></li>
-<li><p>Reload systemd configuration</p></li>
-<li><p>Restart ScyllaDB</p></li>
-<li><p>Validate the rollback success</p></li>
-</ul>
-<p>Apply the procedure <strong>serially</strong> on each node. Do not move to the next node
-before validating that the rollback was successful and the node is up and
-running the old version.</p>
-</section>
-<section id="rollback-steps">
-<h2>Rollback Steps<a class="headerlink" href="#rollback-steps" title="Link to this heading">¶</a></h2>
-<section id="drain-and-gracefully-stop-the-node">
-<h3>Drain and gracefully stop the node<a class="headerlink" href="#drain-and-gracefully-stop-the-node" title="Link to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>nodetool<span class="w"> </span>drain
-sudo<span class="w"> </span>service<span class="w"> </span>scylla-server<span class="w"> </span>stop
-</pre></div>
-</div>
-</section>
-<section id="restore-and-install-the-old-release">
-<h3>Restore and install the old release<a class="headerlink" href="#restore-and-install-the-old-release" title="Link to this heading">¶</a></h3>
-<div class="sphinx-tabs docutils container">
-<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-2-RGViaWFuL1VidW50dQ==" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-2-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tab" tabindex="0">Debian/Ubuntu</button><button aria-controls="panel-2-UkhFTC9DZW50T1M=" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-2-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tab" tabindex="-1">RHEL/CentOS</button><button aria-controls="panel-2-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-2-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" name="RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" role="tab" tabindex="-1">EC2/GCP/Azure Ubuntu Image</button></div><div aria-labelledby="tab-2-RGViaWFuL1VidW50dQ==" class="sphinx-tabs-panel group-tab" id="panel-2-RGViaWFuL1VidW50dQ==" name="RGViaWFuL1VidW50dQ==" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Remove the old repo file.</p>
-<blockquote>
-<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/etc/apt/sources.list.d/scylla.list
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Restore the 2025.x packages backed up during the upgrade.</p>
-<blockquote>
-<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>cp<span class="w"> </span>~/scylla.list-backup<span class="w"> </span>/etc/apt/sources.list.d/scylla.list
-sudo<span class="w"> </span>chown<span class="w"> </span>root.root<span class="w"> </span>/etc/apt/sources.list.d/scylla.list
-sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">644</span><span class="w"> </span>/etc/apt/sources.list.d/scylla.list
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Install:</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">remove</span> <span class="n">scylla</span>\<span class="o">*</span> <span class="o">-</span><span class="n">y</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">scylla</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
-<p>Answer ‘y’ to the first two questions.</p>
-</div><div aria-labelledby="tab-2-UkhFTC9DZW50T1M=" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-2-UkhFTC9DZW50T1M=" name="UkhFTC9DZW50T1M=" role="tabpanel" tabindex="0"><ol class="arabic">
-<li><p>Remove the old repo file.</p>
-<blockquote>
-<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/etc/yum.repos.d/scylla.repo
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Restore the 2025.x packages backed up during the upgrade procedure.</p>
-<blockquote>
-<div><div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>cp<span class="w"> </span>~/scylla.repo-backup<span class="w"> </span>/etc/yum.repos.d/scylla.repo
-sudo<span class="w"> </span>chown<span class="w"> </span>root.root<span class="w"> </span>/etc/yum.repos.d/scylla.repo
-sudo<span class="w"> </span>chmod<span class="w"> </span><span class="m">644</span><span class="w"> </span>/etc/yum.repos.d/scylla.repo
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-<li><p>Install:</p>
-<blockquote>
-<div><div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo yum clean all</span>
-<span class="go">sudo yum remove scylla\*</span>
-<span class="go">sudo yum install scylla</span>
-</pre></div>
-</div>
-</div></blockquote>
-</li>
-</ol>
-</div><div aria-labelledby="tab-2-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-2-RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" name="RUMyL0dDUC9BenVyZSBVYnVudHUgSW1hZ2U=" role="tabpanel" tabindex="0"><p>If you’re using the ScyllaDB official image (recommended), see the <strong>Debian/Ubuntu</strong>
-tab for upgrade instructions.</p>
-<p>If you’re using your own image and installed ScyllaDB packages for Ubuntu or Debian,
-you need to additionally restore the <code class="docutils literal notranslate"><span class="pre">scylla-machine-image</span></code> package.</p>
+<p>If you need to abort the migration <strong>before finalization</strong>, you can roll back
+by downgrading each node back to vnodes. The rollback procedure is the
+following:</p>
 <ol class="arabic">
-<li><p>Restore the 2025.x packages backed up during the upgrade
-(see the <strong>Debian/Ubuntu</strong> tab).</p></li>
-<li><p>Install:</p>
-<blockquote>
-<div><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">remove</span> <span class="n">scylla</span>\<span class="o">*</span> <span class="o">-</span><span class="n">y</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">scylla</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">scylla</span><span class="o">-</span><span class="n">machine</span><span class="o">-</span><span class="n">image</span>
+<li><p>Find all nodes that have been upgraded to tablets (status: <code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">tablets</span></code>)
+or they are in the process of upgrading to tablets (status: <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">tablets</span></code>):</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
 </pre></div>
 </div>
-</div></blockquote>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   uses tablets  &lt;---</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   migrating to tablets  &lt;---</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>For <strong>each upgraded or upgrading node</strong> in the cluster, perform a downgrade
+(one node at a time):</p>
+<ol class="arabic">
+<li><p>Mark the node for downgrade:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool -h &lt;node-ip&gt; migrate-to-tablets downgrade</span>
+</pre></div>
+</div>
+</li>
+<li><p>Check the node status. The status for a previously upgraded node should
+change from <code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">tablets</span></code> to <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">vnodes</span></code>. The status for a
+previously upgrading node should change from <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">tablets</span></code> to
+<code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">vnodes</span></code> or <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">vnodes</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   migrating to vnodes  &lt;---</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   migrating to tablets</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>If the node status is <code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">vnodes</span></code>, the downgrade is complete. Move to
+the next node and repeat from step a.</p></li>
+<li><p>If the node is <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">vnodes</span></code>, restart it to complete the
+downgrade:</p>
+<ol class="arabic">
+<li><p>Drain and stop the node:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool -h &lt;node-ip&gt; drain</span>
+</pre></div>
+</div>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-2-U3VwcG9ydGVkIE9T" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-2-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tab" tabindex="0">Supported OS</button><button aria-controls="panel-2-RG9ja2Vy" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-2-RG9ja2Vy" name="RG9ja2Vy" role="tab" tabindex="-1">Docker</button></div><div aria-labelledby="tab-2-U3VwcG9ydGVkIE9T" class="sphinx-tabs-panel group-tab" id="panel-2-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>stop<span class="w"> </span>scylla-server
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-2-RG9ja2Vy" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-2-RG9ja2Vy" name="RG9ja2Vy" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>some-scylla<span class="w"> </span>supervisorctl<span class="w"> </span>stop<span class="w"> </span>scylla
+</pre></div>
+</div>
+<p>(without stopping <em>some-scylla</em> container)</p>
+</div></div>
+</li>
+<li><p>Restart the node:</p>
+<div class="sphinx-tabs docutils container">
+<div aria-label="Tabbed content" class="closeable" role="tablist"><button aria-controls="panel-3-U3VwcG9ydGVkIE9T" aria-selected="true" class="sphinx-tabs-tab group-tab" id="tab-3-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tab" tabindex="0">Supported OS</button><button aria-controls="panel-3-RG9ja2Vy" aria-selected="false" class="sphinx-tabs-tab group-tab" id="tab-3-RG9ja2Vy" name="RG9ja2Vy" role="tab" tabindex="-1">Docker</button></div><div aria-labelledby="tab-3-U3VwcG9ydGVkIE9T" class="sphinx-tabs-panel group-tab" id="panel-3-U3VwcG9ydGVkIE9T" name="U3VwcG9ydGVkIE9T" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>start<span class="w"> </span>scylla-server
+</pre></div>
+</div>
+</div><div aria-labelledby="tab-3-RG9ja2Vy" class="sphinx-tabs-panel group-tab" hidden="true" id="panel-3-RG9ja2Vy" name="RG9ja2Vy" role="tabpanel" tabindex="0"><div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>some-scylla<span class="w"> </span>supervisorctl<span class="w"> </span>start<span class="w"> </span>scylla
+</pre></div>
+</div>
+<p>(with <em>some-scylla</em> container already running)</p>
+</div></div>
+</li>
+<li><p>Wait until the node is UP and has returned to the ScyllaDB cluster using <a class="reference internal" href="../../nodetool-commands/status.html"><span class="doc">nodetool status</span></a>.
+This operation may take a long time due to resharding. To monitor
+resharding progress, use the task manager API:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool tasks list compaction -h &lt;node-ip&gt; --keyspace &lt;keyspace&gt; | grep -i reshard</span>
+</pre></div>
+</div>
+</li>
+<li><p>Verify that the node status changed from <code class="docutils literal notranslate"><span class="pre">migrating</span> <span class="pre">to</span> <span class="pre">vnodes</span></code> to <code class="docutils literal notranslate"><span class="pre">uses</span> <span class="pre">vnodes</span></code>:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace&gt;</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>scylla<span class="w"> </span>nodetool<span class="w"> </span>migrate-to-tablets<span class="w"> </span>status<span class="w"> </span>ks
+<span class="go">Keyspace: ks</span>
+<span class="go">Status: migrating_to_tablets</span>
+
+<span class="go">Nodes:</span>
+<span class="go">Host ID                                Status</span>
+<span class="go">99d8de76-3954-4727-911a-6a07251b180c   uses vnodes  &lt;---</span>
+<span class="go">0b5fd6f6-9670-4faf-a480-ad58cf119007   migrating to tablets</span>
+<span class="go">017dd39a-3d06-4c8a-8ac4-379f9e595607   uses vnodes</span>
+</pre></div>
+</div>
+</li>
+<li><p>Move to the next node and repeat from step a until all nodes are
+downgraded.</p></li>
+</ol>
 </li>
 </ol>
-<blockquote>
-<div><p>Answer ‘y’ to the first two questions.</p>
-</div></blockquote>
-</div></div>
-</section>
-<section id="restore-the-configuration-file">
-<h3>Restore the configuration file<a class="headerlink" href="#restore-the-configuration-file" title="Link to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/etc/scylla/scylla.yaml
-sudo<span class="w"> </span>cp<span class="w"> </span>/etc/scylla/scylla.yaml-backup<span class="w"> </span>/etc/scylla/scylla.yaml
+</li>
+<li><p>Once all nodes have been downgraded, finalize the rollback:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets finalize &lt;keyspace&gt;</span>
 </pre></div>
 </div>
+</li>
+</ol>
 </section>
-<section id="reload-systemd-configuration">
-<h3>Reload systemd configuration<a class="headerlink" href="#reload-systemd-configuration" title="Link to this heading">¶</a></h3>
-<p>You must reload the unit file if the systemd unit file is changed.</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>systemctl<span class="w"> </span>daemon-reload
+<section id="migrating-multiple-keyspaces">
+<h2>Migrating multiple keyspaces<a class="headerlink" href="#migrating-multiple-keyspaces" title="Link to this heading">¶</a></h2>
+<p>Migrating multiple keyspaces simultaneously is supported. The procedure is the
+same as with a single keyspace except that the preparation and finalization
+steps need to be repeated for each keyspace. However, note that a new migration
+cannot be started once another migration is in the upgrade phase. The migrations
+need to be prepared and finalized together.</p>
+<p>To migrate multiple keyspaces simultaneously, follow these steps:</p>
+<ol class="arabic">
+<li><p>For <strong>each keyspace</strong>, prepare it for migration:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets start &lt;keyspace1&gt;</span>
+<span class="go">scylla nodetool migrate-to-tablets start &lt;keyspace2&gt;</span>
+<span class="go">...</span>
 </pre></div>
 </div>
-</section>
-<section id="id1">
-<h3>Start the node<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo<span class="w"> </span>service<span class="w"> </span>scylla-server<span class="w"> </span>start
+<p>Verify that all keyspaces are in <code class="docutils literal notranslate"><span class="pre">migrating_to_tablets</span></code> state before
+proceeding:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace1&gt;</span>
+<span class="go">scylla nodetool migrate-to-tablets status &lt;keyspace2&gt;</span>
+<span class="go">...</span>
 </pre></div>
 </div>
-</section>
-<section id="id2">
-<h3>Validate<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
-<p>Check the upgrade instructions above for validation. Once you are sure the node
-rollback is successful, move to the next node in the cluster.</p>
-</section>
+</li>
+<li><p>Upgrade all nodes in the cluster following the same <a class="reference internal" href="#upgrade-nodes"><span class="std std-ref">procedure</span></a>
+as for a single keyspace. Each node restart reshards all keyspaces under
+migration in one pass.</p></li>
+<li><p>For <strong>each keyspace</strong>, finalize the migration:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">scylla nodetool migrate-to-tablets finalize &lt;keyspace1&gt;</span>
+<span class="go">scylla nodetool migrate-to-tablets finalize &lt;keyspace2&gt;</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+</li>
+</ol>
 </section>
 </section>
 
@@ -723,7 +775,7 @@ rollback is successful, move to the next node in the cluster.</p>
             const themeGithubRepository = true;
             let message = 'Great! Thanks for your feedback.';
             if (themeGithubRepository && !liked) {
-                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2026.1/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2026.1/upgrade-guide-from-2025.x-to-2026.1%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
+                message = "Thanks for your feedback! Please don't hesitate to <a href='https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Migrate a Keyspace from Vnodes to Tablets Experimental&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2026.2/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation'>create an issue</a> if you have any suggestions on how we can improve.";
             }
             feedbackMessage.innerHTML = message;
         }
@@ -758,21 +810,21 @@ rollback is successful, move to the next node in the cluster.</p>
                         <div class="content-navigation">
     <div class="navigation navigation--prev">
         
-            <a class="navigation__link" href="index.html">
+            <a class="navigation__link" href="sstable-dictionary-compression.html">
                 <button class="navigation__button">
                     <i class="icon-chevron-left"></i>
                 </button>
                 <div class="navigation__title">
-                    <span class="colored">PREVIOUS</span> <br />Upgrade - ScyllaDB 2025.x to ScyllaDB 2026.1
+                    <span class="colored">PREVIOUS</span> <br />Shared-Dictionary Compression for SSTables
                 </div>
             </a>
         
     </div>
     <div class="navigation navigation--next">
         
-            <a class="navigation__link" href="metric-update-2025.x-to-2026.1.html">
+            <a class="navigation__link" href="../maintenance/index.html">
                 <div class="navigation__title">
-                    <span class="colored">NEXT</span> <br />Metrics Update Between 2025.x and 2026.1
+                    <span class="colored">NEXT</span> <br />ScyllaDB Maintenance Procedures
                 </div>
                 <button class="navigation__button">
                     <i class="icon-chevron-right"></i>
@@ -792,14 +844,14 @@ rollback is successful, move to the next node in the cluster.</p>
     
     <ul class="contribute">
         <li class="contribute__item">
-            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2026.1/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2026.1/upgrade-guide-from-2025.x-to-2026.1%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
+            <a class="button button-sm" href="https://github.com/scylladb/scylladb/issues/new?title=docs:%20Issue on page Migrate a Keyspace from Vnodes to Tablets Experimental&&body=I%20would%20like%20to%20report%20an%20issue%20on%20page%20https://docs.scylladb.com/manual/branch-2026.2/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets%0A%0A%23%23%23%20Problem%0A%0A%23%23%23%20%20Suggest%20a%20fix&labels=documentation"
                target="_blank">
                 <i class="icon-github" aria-hidden="true"></i>Create an issue
             </a>
         </li>
         
             <li class="contribute__item">
-                <a class="button button-sm" href="https://github.com/scylladb/scylladb/edit/master/docs/upgrade/upgrade-guides/upgrade-guide-from-2025.x-to-2026.1/upgrade-guide-from-2025.x-to-2026.1.rst"
+                <a class="button button-sm" href="https://github.com/scylladb/scylladb/edit/master/docs/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets.rst"
                    target="_blank">
                     <i class="icon-edit" aria-hidden="true"></i>Edit this page
                 </a>
@@ -811,29 +863,13 @@ rollback is successful, move to the next node in the cluster.</p>
         <div class="secondary-side-nav__content">
             <p class="topic-title">On this page</p>
             <ul>
-<li><a class="reference internal" href="#">Upgrade from ScyllaDB 2025.x to ScyllaDB 2026.1</a><ul>
-<li><a class="reference internal" href="#before-you-upgrade-scylladb">Before You Upgrade ScyllaDB</a></li>
-<li><a class="reference internal" href="#upgrade-procedure">Upgrade Procedure</a></li>
-<li><a class="reference internal" href="#upgrade-steps">Upgrade Steps</a><ul>
-<li><a class="reference internal" href="#check-the-cluster-schema">Check the cluster schema</a></li>
-<li><a class="reference internal" href="#backup-the-data">Backup the data</a></li>
-<li><a class="reference internal" href="#backup-the-configuration-file">Backup the configuration file</a></li>
-<li><a class="reference internal" href="#gracefully-stop-the-node">Gracefully stop the node</a></li>
-<li><a class="reference internal" href="#download-and-install-the-new-release">Download and install the new release</a></li>
-<li><a class="reference internal" href="#start-the-node">Start the node</a></li>
-<li><a class="reference internal" href="#validate">Validate</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">Migrate a Keyspace from Vnodes to Tablets <span class="label label--caution">Experimental</span></a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#limitations">Limitations</a></li>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#procedure">Procedure</a></li>
 <li><a class="reference internal" href="#rollback-procedure">Rollback Procedure</a></li>
-<li><a class="reference internal" href="#rollback-steps">Rollback Steps</a><ul>
-<li><a class="reference internal" href="#drain-and-gracefully-stop-the-node">Drain and gracefully stop the node</a></li>
-<li><a class="reference internal" href="#restore-and-install-the-old-release">Restore and install the old release</a></li>
-<li><a class="reference internal" href="#restore-the-configuration-file">Restore the configuration file</a></li>
-<li><a class="reference internal" href="#reload-systemd-configuration">Reload systemd configuration</a></li>
-<li><a class="reference internal" href="#id1">Start the node</a></li>
-<li><a class="reference internal" href="#id2">Validate</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#migrating-multiple-keyspaces">Migrating multiple keyspaces</a></li>
 </ul>
 </li>
 </ul>
@@ -882,7 +918,7 @@ rollback is successful, move to the next node in the cluster.</p>
     <li class="scylla-dropdown__item">
         <a class="scylla-dropdown__title" href="#">
             
-                2026.1
+                2026.2
             
             <i class="chevron icon-docs-chevron-right"></i>
         </a>
@@ -890,19 +926,19 @@ rollback is successful, move to the next node in the cluster.</p>
             
                 
                     <li>
-                        <a href="../../../../master/index.html">master</a>
+                        <a href="../../../../master/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets.html">master</a>
                     </li>
                 
             
                 
                     <li>
-                        <a href="../../../../branch-2026.2/index.html">2026.2</a>
+                        <a href="migrate-vnodes-to-tablets.html">2026.2</a>
                     </li>
                 
             
                 
                     <li>
-                        <a href="upgrade-guide-from-2025.x-to-2026.1.html">2026.1</a>
+                        <a href="../../../../branch-2026.1/index.html">2026.1</a>
                     </li>
                 
             
@@ -937,12 +973,12 @@ rollback is successful, move to the next node in the cluster.</p>
         <div class="side-nav__content">
             <ul class="current">
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../getting-started/index.html">Getting Started</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting-started/install-scylla/index.html">Install ScyllaDB 2026.1</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-aws.html">Launch ScyllaDB 2026.1 on AWS</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-gcp.html">Launch ScyllaDB 2026.1 on GCP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-azure.html">Launch ScyllaDB 2026.1 on Azure</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting-started/install-scylla/index.html">Install ScyllaDB 2026.2</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label for="toctree-checkbox-2"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-aws.html">Launch ScyllaDB 2026.2 on AWS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-gcp.html">Launch ScyllaDB 2026.2 on GCP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/launch-on-azure.html">Launch ScyllaDB 2026.2 on Azure</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/installation-common/scylla-web-installer.html">ScyllaDB Web Installer for Linux</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/install-on-linux.html">Install ScyllaDB 2026.1 Linux Packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/install-on-linux.html">Install ScyllaDB 2026.2 Linux Packages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/install-scylla/run-in-docker.html">Run ScyllaDB in Docker</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/installation-common/unified-installer.html">Install ScyllaDB Without root Privileges</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/installation-common/air-gapped-install.html">Air-gapped Server Installation</a></li>
@@ -954,13 +990,13 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting-started/config-commands.html">ScyllaDB Configuration Reference</a></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../getting-started/requirements.html">ScyllaDB Requirements</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label for="toctree-checkbox-3"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/system-requirements.html">System Requirements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../getting-started/os-support.html">OS Support</a></li>
+<li class="toctree-l3"><a class="reference external" href="https://docs.scylladb.com/stable/versioning/os-support-per-version.html">OS Support</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/cloud-instance-recommendations.html">Cloud Instance Recommendations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/scylla-in-a-shared-environment.html">ScyllaDB in a Shared Environment</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../using-scylla/migrate-scylla.html">Migrate to ScyllaDB</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label for="toctree-checkbox-4"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/cassandra-to-scylla-migration-process.html">Migration Process from Cassandra to ScyllaDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cassandra-to-scylla-migration-process.html">Migration Process from Cassandra to ScyllaDB</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../using-scylla/cassandra-compatibility.html">ScyllaDB and Apache Cassandra Compatibility</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../using-scylla/mig-tool-review.html">Migration Tools Overview</a></li>
 </ul>
@@ -985,76 +1021,75 @@ rollback is successful, move to the next node in the cluster.</p>
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current has-children"><a class="reference internal" href="../../../operating-scylla/index.html">ScyllaDB for Administrators</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label for="toctree-checkbox-6"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../../../operating-scylla/admin.html">Administration Guide</a></li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../operating-scylla/procedures/index.html">Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label for="toctree-checkbox-7"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/cluster-management/index.html">Cluster Management</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/backup-restore/index.html">Backup &amp; Restore</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/config-change/index.html">Change Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/maintenance/index.html">Maintenance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/tips/index.html">Best Practices</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/benchmarking-scylla.html">Benchmarking ScyllaDB</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/cassandra-to-scylla-migration-process.html">Migrate from Cassandra to ScyllaDB</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="../../index.html">ScyllaDB for Administrators</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label for="toctree-checkbox-6"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../admin.html">Administration Guide</a></li>
+<li class="toctree-l2 current has-children"><a class="reference internal" href="../index.html">Procedures</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label for="toctree-checkbox-7"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../cluster-management/index.html">Cluster Management</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../backup-restore/index.html">Backup &amp; Restore</a></li>
+<li class="toctree-l3 current current-page"><a class="reference internal" href="index.html">Change Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../maintenance/index.html">Maintenance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tips/index.html">Best Practices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../benchmarking-scylla.html">Benchmarking ScyllaDB</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../cassandra-to-scylla-migration-process.html">Migrate from Cassandra to ScyllaDB</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/installation-common/disable-housekeeping.html">Disable Housekeeping</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../operating-scylla/security/index.html">Security</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label for="toctree-checkbox-8"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/security-checklist.html">ScyllaDB Security Checklist</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/authentication.html">Enable Authentication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/runtime-authentication.html">Enable and Disable Authentication Without Downtime</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/create-superuser.html">Creating a Custom Superuser</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/gen-cqlsh-file.html">Generate a cqlshrc File</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../security/index.html">Security</a><input class="toctree-checkbox" id="toctree-checkbox-8" name="toctree-checkbox-8" type="checkbox"/><label for="toctree-checkbox-8"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../security/security-checklist.html">ScyllaDB Security Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/authentication.html">Enable Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/runtime-authentication.html">Enable and Disable Authentication Without Downtime</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/create-superuser.html">Creating a Superuser</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/gen-cqlsh-file.html">Generate a cqlshrc File</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../troubleshooting/password-reset.html">Reset Authenticator Password</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/enable-authorization.html">Enable Authorization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/authorization.html">Grant Authorization CQL Reference</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/certificate-authentication.html">Certificate-based Authentication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/rbac-usecase.html">Role Based Access Control (RBAC)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/auditing.html">ScyllaDB Auditing Guide</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/client-node-encryption.html">Encryption: Data in Transit Client to Node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/node-node-encryption.html">Encryption: Data in Transit Node to Node</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/generate-certificate.html">Generating a self-signed Certificate Chain Using openssl</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/saslauthd.html">Configure SaslauthdAuthenticator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/encryption-at-rest.html">Encryption at Rest</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/ldap-authentication.html">LDAP Authentication</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/ldap-authorization.html">LDAP Authorization (Role Management)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/security/sbom.html">Software Bill Of Materials (SBOM)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/enable-authorization.html">Enable Authorization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/authorization.html">Grant Authorization CQL Reference</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/certificate-authentication.html">Certificate-based Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/rbac-usecase.html">Role Based Access Control (RBAC)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/auditing.html">ScyllaDB Auditing Guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/client-node-encryption.html">Encryption: Data in Transit Client to Node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/node-node-encryption.html">Encryption: Data in Transit Node to Node</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/generate-certificate.html">Generating a self-signed Certificate Chain Using openssl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/saslauthd.html">Configure SaslauthdAuthenticator</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/encryption-at-rest.html">Encryption at Rest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/ldap-authentication.html">LDAP Authentication</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/ldap-authorization.html">LDAP Authorization (Role Management)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../security/sbom.html">Software Bill Of Materials (SBOM)</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../operating-scylla/admin-tools/index.html">Admin Tools</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label for="toctree-checkbox-9"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/nodetool.html">Nodetool Reference</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../admin-tools/index.html">Admin Tools</a><input class="toctree-checkbox" id="toctree-checkbox-9" name="toctree-checkbox-9" type="checkbox"/><label for="toctree-checkbox-9"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../nodetool.html">Nodetool Reference</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../cql/cqlsh.html">CQLSh</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/rest.html">Admin REST API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../rest.html">Admin REST API</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../using-scylla/tracing.html">Tracing</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/scylla-sstable.html">ScyllaDB SStable</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/scylla-sstable-script-api.html">ScyllaDB SStable Script API</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/scylla-types.html">ScyllaDB Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/sstableloader.html">SSTableLoader</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/cassandra-stress.html">cassandra-stress</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/scylla-sstable.html">ScyllaDB SStable</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/scylla-sstable-script-api.html">ScyllaDB SStable Script API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/scylla-types.html">ScyllaDB Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/sstableloader.html">SSTableLoader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/cassandra-stress.html">cassandra-stress</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/logging.html">ScyllaDB Logs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/perftune.html">Seastar Perftune</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/virtual-tables.html">Virtual Tables</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/select-from-mutation-fragments.html">Reading mutation fragments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/maintenance-socket.html">Maintenance socket</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/maintenance-mode.html">Maintenance mode</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin-tools/task-manager.html">Task manager</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/perftune.html">Seastar Perftune</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/virtual-tables.html">Virtual Tables</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/select-from-mutation-fragments.html">Reading mutation fragments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/maintenance-socket.html">Maintenance socket</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/maintenance-mode.html">Maintenance mode</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin-tools/task-manager.html">Task manager</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference external" href="https://monitoring.docs.scylladb.com/">ScyllaDB Monitoring Stack</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://operator.docs.scylladb.com/">ScyllaDB Operator</a></li>
 <li class="toctree-l2"><a class="reference external" href="https://manager.docs.scylladb.com/">ScyllaDB Manager</a></li>
-<li class="toctree-l2 current has-children"><a class="reference internal" href="../../index.html">Upgrade Procedures</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label for="toctree-checkbox-10"><i class="icon-chevron-right"></i></label><div class="break"></div><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../../about-upgrade.html">About Upgrade</a></li>
-<li class="toctree-l3 current current-page"><a class="reference internal" href="../index.html">Upgrade Guides</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../../upgrade/index.html">Upgrade Procedures</a><input class="toctree-checkbox" id="toctree-checkbox-10" name="toctree-checkbox-10" type="checkbox"/><label for="toctree-checkbox-10"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../upgrade/upgrade-guides/index.html">Upgrade Guides</a></li>
 </ul>
 </li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../../../operating-scylla/system-configuration/index.html">System Configuration</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label for="toctree-checkbox-11"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../system-configuration/index.html">System Configuration</a><input class="toctree-checkbox" id="toctree-checkbox-11" name="toctree-checkbox-11" type="checkbox"/><label for="toctree-checkbox-11"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../getting-started/system-configuration.html">System Configuration Guide</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/admin.html">scylla.yaml</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/system-configuration/snitch.html">ScyllaDB Snitches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../admin.html">scylla.yaml</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../system-configuration/snitch.html">ScyllaDB Snitches</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../operating-scylla/benchmarking-scylla.html">Benchmarking ScyllaDB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../operating-scylla/diagnostics.html">ScyllaDB Diagnostic Tools</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../benchmarking-scylla.html">Benchmarking ScyllaDB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../diagnostics.html">ScyllaDB Diagnostic Tools</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../using-scylla/index.html">ScyllaDB for Developers</a><input class="toctree-checkbox" id="toctree-checkbox-12" name="toctree-checkbox-12" type="checkbox"/><label for="toctree-checkbox-12"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
@@ -1085,6 +1120,7 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/secondary-indexes.html">Global Secondary Indexes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/time-to-live.html">Expiring Data with Time to Live (TTL)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/functions.html">Functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../cql/guardrails.html">CQL Guardrails</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/wasm.html">Wasm support for user-defined functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/json.html">JSON Support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../cql/mv.html">Materialized Views</a></li>
@@ -1098,6 +1134,7 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2"><a class="reference internal" href="../../../alternator/compatibility.html">ScyllaDB Alternator for DynamoDB users</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../alternator/new-apis.html">Alternator-specific APIs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../alternator/network.html">Reducing network costs in Alternator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../alternator/vector-search.html">Alternator Vector Search</a></li>
 </ul>
 </li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../../../features/index.html">Features</a><input class="toctree-checkbox" id="toctree-checkbox-16" name="toctree-checkbox-16" type="checkbox"/><label for="toctree-checkbox-16"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
@@ -1134,7 +1171,7 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../architecture/anti-entropy/index.html">ScyllaDB Anti-Entropy</a><input class="toctree-checkbox" id="toctree-checkbox-19" name="toctree-checkbox-19" type="checkbox"/><label for="toctree-checkbox-19"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../architecture/anti-entropy/hinted-handoff.html">ScyllaDB Hinted Handoff</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../architecture/anti-entropy/read-repair.html">ScyllaDB Read Repair</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../operating-scylla/procedures/maintenance/repair.html">ScyllaDB Repair</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../maintenance/repair.html">ScyllaDB Repair</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../architecture/sstable/index.html">SSTable</a><input class="toctree-checkbox" id="toctree-checkbox-20" name="toctree-checkbox-20" type="checkbox"/><label for="toctree-checkbox-20"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
@@ -1157,7 +1194,6 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../troubleshooting/startup/index.html">ScyllaDB Startup</a><input class="toctree-checkbox" id="toctree-checkbox-23" name="toctree-checkbox-23" type="checkbox"/><label for="toctree-checkbox-23"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../troubleshooting/change-ownership.html">Ownership Problems</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../troubleshooting/scylla-wont-start.html">ScyllaDB will not Start</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../troubleshooting/python-error-no-module-named-yaml.html">ScyllaDB Python Script broken</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../troubleshooting/cluster/index.html">Cluster and Node</a><input class="toctree-checkbox" id="toctree-checkbox-24" name="toctree-checkbox-24" type="checkbox"/><label for="toctree-checkbox-24"><i class="icon-chevron-right"></i></label><div class="break"></div><ul>
@@ -1218,7 +1254,6 @@ rollback is successful, move to the next node in the cluster.</p>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/garbage-collection-ics.html">Efficient Tombstone Garbage Collection in ICS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/gc-grace-seconds.html">How to Change gc_grace_seconds for a Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/gossip.html">Gossip in ScyllaDB</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../kb/increase-permission-cache.html">Increase Permission Cache to Avoid Non-paged Queries</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/lwt-differences.html">How does ScyllaDB LWT Differ from Apache Cassandra ?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/map-cpu.html">Map CPUs to ScyllaDB Shards</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../kb/memory-usage.html">ScyllaDB Memory Usage</a></li>
@@ -1334,7 +1369,7 @@ rollback is successful, move to the next node in the cluster.</p>
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 29 Jun 2026.
+                        Last updated on 30 Jun 2026.
                     
                 </div>
             
