@@ -3512,166 +3512,331 @@
 </section>
 <section id="manager">
 <h2>Manager<a class="headerlink" href="#manager" title="Link to this heading">¶</a></h2>
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-size-of-hints-in-progress">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_size_of_hints_in_progress">
-<span class="sig-name descname"><span class="pre">scylla_group_name_size_of_hints_in_progress</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_size_of_hints_in_progress" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-size-of-hints-in-progress">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_size_of_hints_in_progress">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_size_of_hints_in_progress</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_size_of_hints_in_progress" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Size of hinted mutations that are scheduled to be written.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">size_of_hints_in_progress</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-written">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_written">
-<span class="sig-name descname"><span class="pre">scylla_group_name_written</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_written" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-size-of-hints-in-progress">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_size_of_hints_in_progress">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_size_of_hints_in_progress</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_size_of_hints_in_progress" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Size of hinted mutations that are scheduled to be written.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">size_of_hints_in_progress</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-written">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_written">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_written</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_written" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of successfully written hints.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">written</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-errors">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_errors">
-<span class="sig-name descname"><span class="pre">scylla_group_name_errors</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_errors" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-written">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_written">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_written</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_written" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of successfully written hints.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">written</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-errors">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_errors">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_errors</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_errors" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of errors during hints writes.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">errors</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-dropped">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_dropped">
-<span class="sig-name descname"><span class="pre">scylla_group_name_dropped</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_dropped" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-errors">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_errors">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_errors</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_errors" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of errors during hints writes.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">errors</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-dropped">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_dropped">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_dropped</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_dropped" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of dropped hints.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">dropped</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-sent-total">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_sent_total">
-<span class="sig-name descname"><span class="pre">scylla_group_name_sent_total</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_sent_total" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-dropped">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_dropped">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_dropped</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_dropped" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of dropped hints.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">dropped</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-sent-total">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_sent_total">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_sent_total</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_sent_total" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of sent hints.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">sent_total</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-sent-bytes-total">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_sent_bytes_total">
-<span class="sig-name descname"><span class="pre">scylla_group_name_sent_bytes_total</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_sent_bytes_total" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-sent-total">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_sent_total">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_sent_total</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_sent_total" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of sent hints.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">sent_total</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-sent-bytes-total">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_sent_bytes_total">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_sent_bytes_total</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_sent_bytes_total" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>The total size of the sent hints (in bytes)</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">sent_bytes_total</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-discarded">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_discarded">
-<span class="sig-name descname"><span class="pre">scylla_group_name_discarded</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_discarded" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-sent-bytes-total">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_sent_bytes_total">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_sent_bytes_total</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_sent_bytes_total" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>The total size of the sent hints (in bytes)</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">sent_bytes_total</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-discarded">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_discarded">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_discarded</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_discarded" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of hints that were discarded during sending (too old, schema changed, etc.).</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">discarded</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-send-errors">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_send_errors">
-<span class="sig-name descname"><span class="pre">scylla_group_name_send_errors</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_send_errors" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-discarded">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_discarded">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_discarded</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_discarded" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of hints that were discarded during sending (too old, schema changed, etc.).</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">discarded</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-send-errors">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_send_errors">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_send_errors</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_send_errors" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of unexpected errors during sending, sending will be retried later</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">send_errors</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-corrupted-files">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_corrupted_files">
-<span class="sig-name descname"><span class="pre">scylla_group_name_corrupted_files</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_corrupted_files" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-send-errors">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_send_errors">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_send_errors</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_send_errors" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of unexpected errors during sending, sending will be retried later</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">send_errors</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-corrupted-files">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_corrupted_files">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_corrupted_files</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_corrupted_files" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of hints files that were discarded during sending because the file was corrupted.</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">corrupted_files</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-pending-drains">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_pending_drains">
-<span class="sig-name descname"><span class="pre">scylla_group_name_pending_drains</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_pending_drains" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-corrupted-files">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_corrupted_files">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_corrupted_files</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_corrupted_files" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of hints files that were discarded during sending because the file was corrupted.</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">counter</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">corrupted_files</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-pending-drains">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_pending_drains">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_pending_drains</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_pending_drains" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of tasks waiting in the queue for draining hints</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">pending_drains</span></code></p></li>
 </ul>
 </div></blockquote>
 </dd></dl>
 
-<dl class="std metrics_option" id="metricsprop-scylla-group-name-pending-sends">
-<dt class="sig sig-object std" id="metrics_option-scylla_group_name_pending_sends">
-<span class="sig-name descname"><span class="pre">scylla_group_name_pending_sends</span></span><a class="headerlink" href="#metrics_option-scylla_group_name_pending_sends" title="Link to this definition">¶</a></dt>
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-pending-drains">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_pending_drains">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_pending_drains</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_pending_drains" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of tasks waiting in the queue for draining hints</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">pending_drains</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-for-views-manager-pending-sends">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_for_views_manager_pending_sends">
+<span class="sig-name descname"><span class="pre">scylla_hints_for_views_manager_pending_sends</span></span><a class="headerlink" href="#metrics_option-scylla_hints_for_views_manager_pending_sends" title="Link to this definition">¶</a></dt>
 <dd><blockquote>
 <div><p>Number of tasks waiting in the queue for sending a hint</p>
 </div></blockquote>
 <blockquote>
 <div><ul class="simple">
 <li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
-<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">group_name</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_for_views_manager</span></code></p></li>
+<li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">pending_sends</span></code></p></li>
+</ul>
+</div></blockquote>
+</dd></dl>
+
+<dl class="std metrics_option" id="metricsprop-scylla-hints-manager-pending-sends">
+<dt class="sig sig-object std" id="metrics_option-scylla_hints_manager_pending_sends">
+<span class="sig-name descname"><span class="pre">scylla_hints_manager_pending_sends</span></span><a class="headerlink" href="#metrics_option-scylla_hints_manager_pending_sends" title="Link to this definition">¶</a></dt>
+<dd><blockquote>
+<div><p>Number of tasks waiting in the queue for sending a hint</p>
+</div></blockquote>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>Type:</strong> <code class="docutils literal notranslate"><span class="pre">gauge</span></code></p></li>
+<li><p><strong>Component:</strong> <code class="docutils literal notranslate"><span class="pre">hints_manager</span></code></p></li>
 <li><p><strong>Key:</strong> <code class="docutils literal notranslate"><span class="pre">pending_sends</span></code></p></li>
 </ul>
 </div></blockquote>
@@ -10772,7 +10937,7 @@
             
                 <div class="footer-bottom__last-updated">
                     
-                        Last updated on 09 Aug 2026.
+                        Last updated on 10 Aug 2026.
                     
                 </div>
             
