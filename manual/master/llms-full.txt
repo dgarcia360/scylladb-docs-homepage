@@ -483,6 +483,7 @@ If you have tested your application with ScyllaDB and want to publish the result
 * [Maintenance socket](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/maintenance-socket.md) - a Unix domain socket for full-permission CQL connection.
 * [Maintenance mode](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/maintenance-mode.md) - a mode for performing maintenance tasks on an offline ScyllaDB node.
 * [Task manager](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/task-manager.md) - a tool for tracking long-running background operations.
+* [Compression Advisor](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/compression-advisor.md) - analyzes a table’s compression configuration and recommends LZ4/ZSTD settings that reduce on-disk size.
 
 Run each tool with `-h`, `--help` for full options description.
 
@@ -1972,7 +1973,7 @@ should follow this format:
 ```yaml
 object_storage_endpoints:
   - name: http[s]://<endpoint_address_or_domain_name>[:<port_number>]
-    aws_region: <region_name> # optional, e.g. us-east-1
+    aws_region: <region_name> # required unless AWS_DEFAULT_REGION is set, e.g. us-east-1
     iam_role_arn: <iam_role> # optional
 ```
 
@@ -1986,7 +1987,9 @@ object_storage_endpoints:
 ```
 
 The `aws_region` option can also be specified using
-the `AWS_DEFAULT_REGION` environment variable.
+the `AWS_DEFAULT_REGION` environment variable. An S3 endpoint needs a region
+from one of the two. If neither supplies a non-empty value, ScyllaDB logs an
+error and ignores that endpoint.
 
 The AWS-related credentials options (`aws_access_key_id`,
 `aws_secret_access_key`, `aws_session_token`) can be configured using
@@ -4093,6 +4096,34 @@ Node3 is dead. If you add node4 to replace node3 with the same IP address as nod
 
 <!-- -*- mode: rst -*- -->
 
+## 2026.2.6
+
+| Region                    | x86 AMI ID            | Launch x86                                                                                                                                                                                                                                                                                                                                                                                                                                            | ARM AMI ID            | Launch ARM                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|---------------------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Asia Pacific (Hyderabad)  | ami-0abfa4d3b2b8e8b78 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-0abfa4d3b2b8e8b78)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0abfa4d3b2b8e8b78)             | ami-096870121f8ec142c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-096870121f8ec142c)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-096870121f8ec142c)             |
+| Africa (Cape Town)        | ami-08d6317d780caedad | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-08d6317d780caedad)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08d6317d780caedad)             | ami-040df15128bf96940 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-040df15128bf96940)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-040df15128bf96940)             |
+| Asia Pacific (Mumbai)     | ami-0471d93161a1083f0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-0471d93161a1083f0)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0471d93161a1083f0)             | ami-0b991f44082779c59 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-0b991f44082779c59)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b991f44082779c59)             |
+| Europe (Stockholm)        | ami-00bf08df42721a154 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-00bf08df42721a154)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00bf08df42721a154)             | ami-0fb1b383f33d8609c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-0fb1b383f33d8609c)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fb1b383f33d8609c)             |
+| Europe (Paris)            | ami-0dc1ff099cba97be5 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-0dc1ff099cba97be5)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0dc1ff099cba97be5)                | ami-025bdcca9b0d1d31e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-025bdcca9b0d1d31e)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-025bdcca9b0d1d31e)                |
+| Europe (Milan)            | ami-0f05b6423c1db162c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-0f05b6423c1db162c)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f05b6423c1db162c)             | ami-01676b1cdf503f0af | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-01676b1cdf503f0af)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-01676b1cdf503f0af)             |
+| Europe (London)           | ami-08fbbe5c11f666d18 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-08fbbe5c11f666d18)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08fbbe5c11f666d18)                | ami-09be9e3a20211558a | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-09be9e3a20211558a)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09be9e3a20211558a)                |
+| Europe (Ireland)          | ami-04dadc62d57a640bf | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-04dadc62d57a640bf)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-04dadc62d57a640bf)                | ami-00b13d89eac63c2cc | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-00b13d89eac63c2cc)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00b13d89eac63c2cc)                |
+| Asia Pacific (Osaka)      | ami-0f280a35afd18f7cc | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-0f280a35afd18f7cc)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f280a35afd18f7cc) | ami-0fd9eac766bfcfda0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-0fd9eac766bfcfda0)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fd9eac766bfcfda0) |
+| Asia Pacific (Seoul)      | ami-06c1588e72447f00c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-06c1588e72447f00c)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06c1588e72447f00c) | ami-06ca2b6aa0df387d8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-06ca2b6aa0df387d8)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06ca2b6aa0df387d8) |
+| Asia Pacific (Tokyo)      | ami-0fa832b288b6ab9ab | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-0fa832b288b6ab9ab)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fa832b288b6ab9ab) | ami-07d585a3728af00c0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-07d585a3728af00c0)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-07d585a3728af00c0) |
+| Israel (Tel Aviv)         | ami-002162ffb38ec1d7e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-002162ffb38ec1d7e)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-002162ffb38ec1d7e)       | ami-06395e767b67bbf9d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-06395e767b67bbf9d)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06395e767b67bbf9d)       |
+| Canada (Central)          | ami-0f91c8fd8a84a9115 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-0f91c8fd8a84a9115)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f91c8fd8a84a9115)       | ami-0973cfe422b7c34d3 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-0973cfe422b7c34d3)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0973cfe422b7c34d3)       |
+| South America (Sao Paulo) | ami-0b0f623529f1fc879 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-0b0f623529f1fc879)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b0f623529f1fc879)                | ami-04fb16f16d4d7449f | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-04fb16f16d4d7449f)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-04fb16f16d4d7449f)                |
+| Asia Pacific (Hong Kong)  | ami-03834df09d595762e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-03834df09d595762e)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-03834df09d595762e)                | ami-05003ef108ec2baba | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-05003ef108ec2baba)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-05003ef108ec2baba)                |
+| Asia Pacific (Singapore)  | ami-0b7ff297b609c21e1 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-0b7ff297b609c21e1)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b7ff297b609c21e1) | ami-09d0de30410195c88 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-09d0de30410195c88)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09d0de30410195c88) |
+| Asia Pacific (Sydney)     | ami-08a04fbe52b6ec840 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-08a04fbe52b6ec840)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08a04fbe52b6ec840) | ami-0d0ea79f7a3fdcdbe | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-0d0ea79f7a3fdcdbe)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d0ea79f7a3fdcdbe) |
+| Europe (Frankfurt)        | ami-00e4d808b7745c700 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-00e4d808b7745c700)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00e4d808b7745c700)       | ami-073d1c3ef48e547c0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-073d1c3ef48e547c0)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-073d1c3ef48e547c0)       |
+| US East (N. Virginia)     | ami-08e32f3b164e8c8e3 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-08e32f3b164e8c8e3)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08e32f3b164e8c8e3)                | ami-061e7d4b9a549d4ba | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-061e7d4b9a549d4ba)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-061e7d4b9a549d4ba)                |
+| US East (Ohio)            | ami-0d2dcb98fd19d3d5d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-0d2dcb98fd19d3d5d)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d2dcb98fd19d3d5d)                | ami-05e86cef240527186 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-05e86cef240527186)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-05e86cef240527186)                |
+| US West (N. California)   | ami-004763c7f9ac76ef8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-004763c7f9ac76ef8)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-004763c7f9ac76ef8)                | ami-0442ecadc56d31cc4 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-0442ecadc56d31cc4)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0442ecadc56d31cc4)                |
+| US West (Oregon)          | ami-0ede009870936e569 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-0ede009870936e569)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0ede009870936e569)                | ami-070df39bbe64db8c8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-070df39bbe64db8c8)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-070df39bbe64db8c8)                |
+<!-- -*- mode: rst -*- -->
+
 ## 2026.2.5
 
 | Region                    | x86 AMI ID            | Launch x86                                                                                                                                                                                                                                                                                                                                                                                                                                            | ARM AMI ID            | Launch ARM                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -4265,6 +4296,13 @@ Node3 is dead. If you add node4 to replace node3 with the same IP address as nod
 
 # Azure Images
 
+<!-- -*- mode: rst -*- -->
+
+## 2026.2.6
+
+| Gallery Image Definition   | Gallery Image Version   | Public Gallery Name                           |
+|----------------------------|-------------------------|-----------------------------------------------|
+| scylla-2026.2              | 2026.2.6                | scylladb-7e8d8a04-23db-487d-87ec-0e175c0615bb |
 <!-- -*- mode: rst -*- -->
 
 ## 2026.2.5
@@ -5373,6 +5411,7 @@ The tools are based on Apache Cassandra 3.11.
 * [Maintenance socket](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/maintenance-socket.md) - a Unix domain socket for full-permission CQL connection.
 * [Maintenance mode](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/maintenance-mode.md) - a mode for performing maintenance tasks on an offline ScyllaDB node.
 * [Task manager](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/task-manager.md) - a tool for tracking long-running background operations.
+* [Compression Advisor](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/compression-advisor.md) - analyzes a table’s compression configuration and recommends LZ4/ZSTD settings that reduce on-disk size.
 
 Run each tool with `-h`, `--help` for full options description.
 
@@ -11435,6 +11474,128 @@ they should be easy to detect. Here is a list of these unimplemented features:
 * Alternator does not support multi-attribute (composite) keys in GSIs.
   This feature was added to DynamoDB in November 2025.
   [https://github.com/scylladb/scylladb/issues/27182](https://github.com/scylladb/scylladb/issues/27182)
+
+
+# compression-advisor.md
+
+# Compression Advisor
+
+The Compression Advisor (`tools/compression_advisor.py`) analyzes the
+compression configuration of a single table and recommends whether a different
+compressor, compression level, or chunk length would meaningfully reduce its
+on-disk size.
+
+It reads the table’s current compression settings over CQL, asks the node to
+estimate compression ratios for a range of candidate configurations through the
+`estimate_compression_ratios` REST API, and prints a color-coded heatmap grid,
+a summary table comparing the current configuration against the best LZ4 and
+ZSTD candidates, and a single ready-to-run `ALTER TABLE` statement for the
+best overall recommendation.
+
+The advisor only recommends a change when it improves the estimated compression
+ratio by at least 5%, and it prefers the default 4 KB chunk length unless a
+larger chunk is more than 5% better. This avoids churning table settings for
+negligible gains.
+
+## Prerequisites
+
+* Python 3.
+* The [ScyllaDB Python driver](https://python-driver.docs.scylladb.com/) (`scylla-driver`), used to
+  read the current compression configuration over CQL. Install it with:
+  ```console
+  pip install scylla-driver
+  ```
+
+  Without the driver, the tool still runs and prints the heatmap and
+  recommendations, but cannot compare against the current configuration.
+* Network access from where you run the tool to:
+  * the ScyllaDB CQL native transport port (`9042` by default), and
+  * the ScyllaDB Admin REST API port (`10000` by default).
+* The `SSTABLE_COMPRESSION_DICTS` cluster feature must be enabled on all
+  nodes. If not enabled, the `estimate_compression_ratios` REST API is
+  unavailable and Compression Advisor reports that the API returned invalid
+  JSON.
+
+## Usage
+
+```console
+python3 tools/compression_advisor.py --host <node-ip> --keyspace <ks> --table <tbl> [options]
+```
+
+For example:
+
+```console
+python3 tools/compression_advisor.py --host 127.0.0.1 --keyspace myks --table mytbl
+```
+
+To disable the ANSI color output (for example when redirecting to a file):
+
+```console
+python3 tools/compression_advisor.py --host 127.0.0.1 --keyspace myks --table mytbl --no-color
+```
+
+If the cluster uses `PasswordAuthenticator`, pass CQL credentials so the tool
+can read the current compression configuration:
+
+```console
+python3 tools/compression_advisor.py --host 127.0.0.1 --keyspace myks --table mytbl --username scylla --password mypassword
+```
+
+## Options
+
+| Option       | Default      | Description                                                                                            |
+|--------------|--------------|--------------------------------------------------------------------------------------------------------|
+| `--host`     | *(required)* | IP address of a ScyllaDB node to query.                                                                |
+| `--keyspace` | *(required)* | Keyspace name of the table to analyze.                                                                 |
+| `--table`    | *(required)* | Table name to analyze.                                                                                 |
+| `--api-port` | `10000`      | ScyllaDB Admin REST API port.                                                                          |
+| `--cql-port` | `9042`       | ScyllaDB CQL native transport port.                                                                    |
+| `--username` | *(none)*     | CQL username, required if the cluster uses `PasswordAuthenticator`.                                    |
+| `--password` | *(none)*     | CQL password, required if the cluster uses `PasswordAuthenticator`.                                    |
+| `--no-color` | *off*        | Disable ANSI color output. Color is also disabled automatically when the<br/>output is not a terminal. |
+
+Run the tool with `-h` / `--help` for the full list of options.
+
+## Output
+
+The advisor prints three sections:
+
+* **Heatmap grid** — the estimated compression ratio for every candidate
+  compressor / chunk length / level combination, color-coded so the most
+  effective configurations stand out. The current configuration is highlighted.
+* **Summary table** — the current configuration alongside the best LZ4 and best
+  ZSTD candidates, with the estimated size reduction relative to the current
+  setting.
+* **Recommended change** — a single `ALTER TABLE` statement for the best
+  overall recommendation (chosen between the best LZ4 and best ZSTD candidate).
+  When a dictionary-aware compressor with a retrained dictionary is recommended,
+  the tool also prints the corresponding `retrain_dict` REST call needed to
+  train the compression dictionary.
+
+The recommended `ALTER TABLE` statement always quotes the keyspace and table
+identifiers, uses the dictionary-capable compressor names returned by the
+estimator (for example `ZstdWithDictsCompressor`), and includes
+`compression_level` for ZSTD. For example:
+
+```cql
+ALTER TABLE "myks"."mytbl" WITH compression = {'sstable_compression': 'ZstdWithDictsCompressor', 'chunk_length_in_kb': '4', 'compression_level': '5'};
+```
+
+If the recommendation uses a retrained dictionary, the tool also prints, as
+comments, the REST call to train it:
+
+```console
+-- Then retrain the dictionary (requires SSTABLE_COMPRESSION_DICTS feature):
+-- POST /storage_service/retrain_dict?keyspace=myks&cf=mytbl
+```
+
+When no change improves the estimated ratio by more than 5%, the tool reports
+that the current configuration is already optimal instead of printing an
+`ALTER TABLE` statement.
+
+#### NOTE
+The advisor only estimates and recommends; it never modifies the table.
+Apply any recommended `ALTER TABLE` statement yourself after reviewing it.
 
 
 # config-commands.md
@@ -24100,6 +24261,13 @@ The operations that generate tombstones are:
 
 <!-- -*- mode: rst -*- -->
 
+## 2026.2.6
+
+| Image Name        |            Image ID |
+|-------------------|---------------------|
+| scylladb-2026-2-6 | 8291844249565379774 |
+<!-- -*- mode: rst -*- -->
+
 ## 2026.2.5
 
 | Image Name        |            Image ID |
@@ -27401,32 +27569,32 @@ as-a-service, see [ScyllaDB Cloud documentation](https://cloud.docs.scylladb.com
    The following table shows the latest patch release. See [AWS Images](https://docs.scylladb.com/manual/master/reference/aws-images.md) for earlier releases.
    <!-- -*- mode: rst -*- -->
 
-   ### 2026.2.5
+   ### 2026.2.6
 
    | Region                    | x86 AMI ID            | Launch x86                                                                                                                                                                                                                                                                                                                                                                                                                                            | ARM AMI ID            | Launch ARM                                                                                                                                                                                                                                                                                                                                                                                                                                             |
    |---------------------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-   | Asia Pacific (Hyderabad)  | ami-05366fde5efef83ef | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-05366fde5efef83ef)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-05366fde5efef83ef)             | ami-0d580dc97b51a6cb5 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-0d580dc97b51a6cb5)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d580dc97b51a6cb5)             |
-   | Africa (Cape Town)        | ami-0ff943ed564677478 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-0ff943ed564677478)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0ff943ed564677478)             | ami-0e918b8d637b9c4f4 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-0e918b8d637b9c4f4)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0e918b8d637b9c4f4)             |
-   | Asia Pacific (Mumbai)     | ami-09baae35fad50edd9 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-09baae35fad50edd9)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09baae35fad50edd9)             | ami-09a54ebcb7a206ec6 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-09a54ebcb7a206ec6)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09a54ebcb7a206ec6)             |
-   | Europe (Stockholm)        | ami-07e4a2f94c4291d64 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-07e4a2f94c4291d64)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-07e4a2f94c4291d64)             | ami-03c0712c6d72bf816 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-03c0712c6d72bf816)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-03c0712c6d72bf816)             |
-   | Europe (Paris)            | ami-08288d7a57286c957 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-08288d7a57286c957)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08288d7a57286c957)                | ami-08f8516f27ce9feb7 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-08f8516f27ce9feb7)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08f8516f27ce9feb7)                |
-   | Europe (Milan)            | ami-09c6336d666fe46df | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-09c6336d666fe46df)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09c6336d666fe46df)             | ami-071403ed33cfcdfb2 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-071403ed33cfcdfb2)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-071403ed33cfcdfb2)             |
-   | Europe (London)           | ami-0edfd6ee0adb365b8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-0edfd6ee0adb365b8)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0edfd6ee0adb365b8)                | ami-0f7e63f2356f953a7 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-0f7e63f2356f953a7)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f7e63f2356f953a7)                |
-   | Europe (Ireland)          | ami-0152917d202ad52f6 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-0152917d202ad52f6)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0152917d202ad52f6)                | ami-014421eabc759080f | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-014421eabc759080f)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-014421eabc759080f)                |
-   | Asia Pacific (Osaka)      | ami-072e7df094781d8e7 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-072e7df094781d8e7)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-072e7df094781d8e7) | ami-0d3b4ab477829eb64 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-0d3b4ab477829eb64)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d3b4ab477829eb64) |
-   | Asia Pacific (Seoul)      | ami-0fb5ad96b653e18b7 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-0fb5ad96b653e18b7)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fb5ad96b653e18b7) | ami-0c3f10818e740417c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-0c3f10818e740417c)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0c3f10818e740417c) |
-   | Asia Pacific (Tokyo)      | ami-0537144170999dc4f | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-0537144170999dc4f)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0537144170999dc4f) | ami-0a18ca9ddb75b7f0d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-0a18ca9ddb75b7f0d)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0a18ca9ddb75b7f0d) |
-   | Israel (Tel Aviv)         | ami-09daf872ba6fcb56d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-09daf872ba6fcb56d)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09daf872ba6fcb56d)       | ami-091f24bca4d5cff68 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-091f24bca4d5cff68)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-091f24bca4d5cff68)       |
-   | Canada (Central)          | ami-03938d75810fec31f | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-03938d75810fec31f)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-03938d75810fec31f)       | ami-037ecebb1fec6a4a1 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-037ecebb1fec6a4a1)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-037ecebb1fec6a4a1)       |
-   | South America (Sao Paulo) | ami-069d14064c679b065 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-069d14064c679b065)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-069d14064c679b065)                | ami-006d89a54c6c43aad | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-006d89a54c6c43aad)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-006d89a54c6c43aad)                |
-   | Asia Pacific (Hong Kong)  | ami-0606b43538ceff526 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-0606b43538ceff526)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0606b43538ceff526)                | ami-009bf3902d58ac4ac | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-009bf3902d58ac4ac)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-009bf3902d58ac4ac)                |
-   | Asia Pacific (Singapore)  | ami-0d8992f3c0e5b3ba8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-0d8992f3c0e5b3ba8)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d8992f3c0e5b3ba8) | ami-0a6b2cc46c4c889be | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-0a6b2cc46c4c889be)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0a6b2cc46c4c889be) |
-   | Asia Pacific (Sydney)     | ami-01a12fbd4b53f142e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-01a12fbd4b53f142e)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-01a12fbd4b53f142e) | ami-00fe0fa1745211a2c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-00fe0fa1745211a2c)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00fe0fa1745211a2c) |
-   | Europe (Frankfurt)        | ami-0e865208dd8691881 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-0e865208dd8691881)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0e865208dd8691881)       | ami-0512a4b024b0c62b0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-0512a4b024b0c62b0)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0512a4b024b0c62b0)       |
-   | US East (N. Virginia)     | ami-059beae625f8d348b | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-059beae625f8d348b)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-059beae625f8d348b)                | ami-061c88eefba08914e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-061c88eefba08914e)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-061c88eefba08914e)                |
-   | US East (Ohio)            | ami-09e9afc80bdc77f23 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-09e9afc80bdc77f23)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09e9afc80bdc77f23)                | ami-031ff063c6ea8db87 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-031ff063c6ea8db87)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-031ff063c6ea8db87)                |
-   | US West (N. California)   | ami-06c7f966a13505a1c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-06c7f966a13505a1c)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06c7f966a13505a1c)                | ami-06c599da768650865 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-06c599da768650865)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06c599da768650865)                |
-   | US West (Oregon)          | ami-0c87eae2bdbb36a86 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-0c87eae2bdbb36a86)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0c87eae2bdbb36a86)                | ami-077404c6143fed1dd | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-077404c6143fed1dd)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.5_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-077404c6143fed1dd)                |
+   | Asia Pacific (Hyderabad)  | ami-0abfa4d3b2b8e8b78 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-0abfa4d3b2b8e8b78)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0abfa4d3b2b8e8b78)             | ami-096870121f8ec142c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-2#LaunchInstanceWizard:ami=ami-096870121f8ec142c)  / [Cluster](https://ap-south-2.console.aws.amazon.com/cloudformation/home?region=ap-south-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-096870121f8ec142c)             |
+   | Africa (Cape Town)        | ami-08d6317d780caedad | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-08d6317d780caedad)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08d6317d780caedad)             | ami-040df15128bf96940 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=af-south-1#LaunchInstanceWizard:ami=ami-040df15128bf96940)  / [Cluster](https://af-south-1.console.aws.amazon.com/cloudformation/home?region=af-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-040df15128bf96940)             |
+   | Asia Pacific (Mumbai)     | ami-0471d93161a1083f0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-0471d93161a1083f0)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0471d93161a1083f0)             | ami-0b991f44082779c59 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-south-1#LaunchInstanceWizard:ami=ami-0b991f44082779c59)  / [Cluster](https://ap-south-1.console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b991f44082779c59)             |
+   | Europe (Stockholm)        | ami-00bf08df42721a154 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-00bf08df42721a154)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00bf08df42721a154)             | ami-0fb1b383f33d8609c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-north-1#LaunchInstanceWizard:ami=ami-0fb1b383f33d8609c)  / [Cluster](https://eu-north-1.console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fb1b383f33d8609c)             |
+   | Europe (Paris)            | ami-0dc1ff099cba97be5 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-0dc1ff099cba97be5)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0dc1ff099cba97be5)                | ami-025bdcca9b0d1d31e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-3#LaunchInstanceWizard:ami=ami-025bdcca9b0d1d31e)  / [Cluster](https://eu-west-3.console.aws.amazon.com/cloudformation/home?region=eu-west-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-025bdcca9b0d1d31e)                |
+   | Europe (Milan)            | ami-0f05b6423c1db162c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-0f05b6423c1db162c)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f05b6423c1db162c)             | ami-01676b1cdf503f0af | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-south-1#LaunchInstanceWizard:ami=ami-01676b1cdf503f0af)  / [Cluster](https://eu-south-1.console.aws.amazon.com/cloudformation/home?region=eu-south-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-01676b1cdf503f0af)             |
+   | Europe (London)           | ami-08fbbe5c11f666d18 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-08fbbe5c11f666d18)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08fbbe5c11f666d18)                | ami-09be9e3a20211558a | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-2#LaunchInstanceWizard:ami=ami-09be9e3a20211558a)  / [Cluster](https://eu-west-2.console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09be9e3a20211558a)                |
+   | Europe (Ireland)          | ami-04dadc62d57a640bf | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-04dadc62d57a640bf)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-04dadc62d57a640bf)                | ami-00b13d89eac63c2cc | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-west-1#LaunchInstanceWizard:ami=ami-00b13d89eac63c2cc)  / [Cluster](https://eu-west-1.console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00b13d89eac63c2cc)                |
+   | Asia Pacific (Osaka)      | ami-0f280a35afd18f7cc | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-0f280a35afd18f7cc)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f280a35afd18f7cc) | ami-0fd9eac766bfcfda0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-3#LaunchInstanceWizard:ami=ami-0fd9eac766bfcfda0)  / [Cluster](https://ap-northeast-3.console.aws.amazon.com/cloudformation/home?region=ap-northeast-3#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fd9eac766bfcfda0) |
+   | Asia Pacific (Seoul)      | ami-06c1588e72447f00c | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-06c1588e72447f00c)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06c1588e72447f00c) | ami-06ca2b6aa0df387d8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-2#LaunchInstanceWizard:ami=ami-06ca2b6aa0df387d8)  / [Cluster](https://ap-northeast-2.console.aws.amazon.com/cloudformation/home?region=ap-northeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06ca2b6aa0df387d8) |
+   | Asia Pacific (Tokyo)      | ami-0fa832b288b6ab9ab | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-0fa832b288b6ab9ab)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0fa832b288b6ab9ab) | ami-07d585a3728af00c0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-northeast-1#LaunchInstanceWizard:ami=ami-07d585a3728af00c0)  / [Cluster](https://ap-northeast-1.console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-07d585a3728af00c0) |
+   | Israel (Tel Aviv)         | ami-002162ffb38ec1d7e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-002162ffb38ec1d7e)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-002162ffb38ec1d7e)       | ami-06395e767b67bbf9d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=il-central-1#LaunchInstanceWizard:ami=ami-06395e767b67bbf9d)  / [Cluster](https://il-central-1.console.aws.amazon.com/cloudformation/home?region=il-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-06395e767b67bbf9d)       |
+   | Canada (Central)          | ami-0f91c8fd8a84a9115 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-0f91c8fd8a84a9115)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0f91c8fd8a84a9115)       | ami-0973cfe422b7c34d3 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ca-central-1#LaunchInstanceWizard:ami=ami-0973cfe422b7c34d3)  / [Cluster](https://ca-central-1.console.aws.amazon.com/cloudformation/home?region=ca-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0973cfe422b7c34d3)       |
+   | South America (Sao Paulo) | ami-0b0f623529f1fc879 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-0b0f623529f1fc879)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b0f623529f1fc879)                | ami-04fb16f16d4d7449f | [Node](https://console.aws.amazon.com/ec2/v2/home?region=sa-east-1#LaunchInstanceWizard:ami=ami-04fb16f16d4d7449f)  / [Cluster](https://sa-east-1.console.aws.amazon.com/cloudformation/home?region=sa-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-04fb16f16d4d7449f)                |
+   | Asia Pacific (Hong Kong)  | ami-03834df09d595762e | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-03834df09d595762e)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-03834df09d595762e)                | ami-05003ef108ec2baba | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-east-1#LaunchInstanceWizard:ami=ami-05003ef108ec2baba)  / [Cluster](https://ap-east-1.console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-05003ef108ec2baba)                |
+   | Asia Pacific (Singapore)  | ami-0b7ff297b609c21e1 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-0b7ff297b609c21e1)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0b7ff297b609c21e1) | ami-09d0de30410195c88 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-1#LaunchInstanceWizard:ami=ami-09d0de30410195c88)  / [Cluster](https://ap-southeast-1.console.aws.amazon.com/cloudformation/home?region=ap-southeast-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-09d0de30410195c88) |
+   | Asia Pacific (Sydney)     | ami-08a04fbe52b6ec840 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-08a04fbe52b6ec840)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08a04fbe52b6ec840) | ami-0d0ea79f7a3fdcdbe | [Node](https://console.aws.amazon.com/ec2/v2/home?region=ap-southeast-2#LaunchInstanceWizard:ami=ami-0d0ea79f7a3fdcdbe)  / [Cluster](https://ap-southeast-2.console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d0ea79f7a3fdcdbe) |
+   | Europe (Frankfurt)        | ami-00e4d808b7745c700 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-00e4d808b7745c700)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-00e4d808b7745c700)       | ami-073d1c3ef48e547c0 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=eu-central-1#LaunchInstanceWizard:ami=ami-073d1c3ef48e547c0)  / [Cluster](https://eu-central-1.console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-073d1c3ef48e547c0)       |
+   | US East (N. Virginia)     | ami-08e32f3b164e8c8e3 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-08e32f3b164e8c8e3)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-08e32f3b164e8c8e3)                | ami-061e7d4b9a549d4ba | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-1#LaunchInstanceWizard:ami=ami-061e7d4b9a549d4ba)  / [Cluster](https://us-east-1.console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-061e7d4b9a549d4ba)                |
+   | US East (Ohio)            | ami-0d2dcb98fd19d3d5d | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-0d2dcb98fd19d3d5d)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0d2dcb98fd19d3d5d)                | ami-05e86cef240527186 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-east-2#LaunchInstanceWizard:ami=ami-05e86cef240527186)  / [Cluster](https://us-east-2.console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-05e86cef240527186)                |
+   | US West (N. California)   | ami-004763c7f9ac76ef8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-004763c7f9ac76ef8)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-004763c7f9ac76ef8)                | ami-0442ecadc56d31cc4 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-1#LaunchInstanceWizard:ami=ami-0442ecadc56d31cc4)  / [Cluster](https://us-west-1.console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0442ecadc56d31cc4)                |
+   | US West (Oregon)          | ami-0ede009870936e569 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-0ede009870936e569)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_x86_64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-0ede009870936e569)                | ami-070df39bbe64db8c8 | [Node](https://console.aws.amazon.com/ec2/v2/home?region=us-west-2#LaunchInstanceWizard:ami=ami-070df39bbe64db8c8)  / [Cluster](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/quickcreate?templateURL=http://downloads.scylladb.com.s3.amazonaws.com/downloads/scylla/aws/cloudformation/scylla_cluster_2026.2.6_aarch64.yaml&stackName=scylla-cluster&param_ScyllaDBAmi=ami-070df39bbe64db8c8)                |
 2. Choose the instance type. See [Cloud Instance Recommendations for AWS](https://docs.scylladb.com/manual/master/getting-started/cloud-instance-recommendations.md#system-requirements-aws) for the list of recommended instances.
 
    Other instance types will work, but with lesser performance. If you choose an instance type other than the recommended ones, make sure to run the [scylla_setup](https://docs.scylladb.com/manual/master/getting-started/system-configuration.md#system-configuration-scripts) script.
@@ -27528,11 +27696,11 @@ search for *ScyllaDB Image* in Community Images.
    For earlier releases, see [Azure Images](https://docs.scylladb.com/manual/master/reference/azure-images.md)
    <!-- -*- mode: rst -*- -->
 
-   ### 2026.2.5
+   ### 2026.2.6
 
    | Gallery Image Definition   | Gallery Image Version   | Public Gallery Name                           |
    |----------------------------|-------------------------|-----------------------------------------------|
-   | scylla-2026.2              | 2026.2.5                | scylladb-7e8d8a04-23db-487d-87ec-0e175c0615bb |
+   | scylla-2026.2              | 2026.2.6                | scylladb-7e8d8a04-23db-487d-87ec-0e175c0615bb |
 6. Get the ScyllaDB image ID using the information from the previous step:
    ```console
      scyllaImageID=$(az sig image-version show-community --location <your region name> --gallery-image-definition <ScyllaDB gallery-image-definition> --gallery-image-version <ScyllaDB gallery-image-version> --public-gallery-name <ScyllDB public-gallery-name> --query ['uniqueId'] --output tsv)
@@ -27592,11 +27760,11 @@ as-a-service, see [ScyllaDB Cloud documentation](https://cloud.docs.scylladb.com
    For earlier releases, see [GCP Images](https://docs.scylladb.com/manual/master/reference/gcp-images.md)
    <!-- -*- mode: rst -*- -->
 
-   ### 2026.2.5
+   ### 2026.2.6
 
    | Image Name        |            Image ID |
    |-------------------|---------------------|
-   | scylladb-2026-2-5 | 5588668313944528497 |
+   | scylladb-2026-2-6 | 8291844249565379774 |
 3. Launch a ScyllaDB instance on GCP with `gcloud` using the information from the previous step. Use the following syntax:
    ```console
    gcloud compute instances create <name of new instance> --image <ScyllaDB image name> --image-project < ScyllaDB project name> --local-ssd interface=nvme --zone=<GCP zone - optional> --machine-type=<machine type>
@@ -33488,18 +33656,21 @@ Restoring a keyspace from a backup requires all snapshot files of the tables, an
 #### NOTE
 For cluster-wide backup and restore, see the [ScyllaDB Manager](https://manager.docs.scylladb.com/stable/restore/) documentation.
 
-#### NOTE
-The following procedure assumes data is restored to the same cluster that was backed-up:
+## Choosing a restore method
 
-- same number of nodes
-- same token range per node
+ScyllaDB supports several restore methods. Choose the one that matches where your backup files are and whether the cluster topology changed since the backup was taken:
 
-The procedure restores each node using the backup file of the **same node**.
-If this is not the case, one should use other restoration methods tools like [sstableloader](https://docs.scylladb.com/manual/master/operating-scylla/procedures/cassandra-to-scylla-migration-process.md). This procedure is much slower than restoring to the same topology cluster.
+* [Restore from object storage](#restore-object-storage) - restore SSTables backed up to S3-compatible object storage with [nodetool backup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/backup.md). Runs on a running cluster and works regardless of cluster topology changes since the backup.
+* [Restore with load and stream](#restore-load-and-stream) - upload backed-up SSTable files to a running cluster; the data is streamed to the nodes owning it. Works regardless of cluster topology changes since the backup.
+* [Restore to an identical cluster](#restore-procedure) - copy snapshot files back in place and restart the nodes. Requires a cluster with the same number of nodes and the same token distribution as at the time of the backup, and each node must be restored from the backup of the **same node**. Suitable for vnode-based keyspaces only.
 
-<a id="restore-procedure"></a>
+For cluster-wide backup and restore, use [ScyllaDB Manager](https://manager.docs.scylladb.com/stable/restore/), which orchestrates the process across the cluster.
 
-## Procedure
+<a id="restore-prerequisites"></a>
+
+## Prerequisites
+
+The following steps and notes apply to all restore methods.
 
 From **one** of the nodes, recreate the schema.
 <br/>
@@ -33513,11 +33684,107 @@ For example:
 
 **Only** a superuser should perform it.
 <br/>
+If the tables you are restoring already exist and contain data, truncate each of them, so that the existing data does not overwrite the restored data. Truncating a base table also truncates its materialized views and secondary indexes, no extra action is needed for them.
+<br/>
 
-### Repeat the following steps for each node in the cluster:
+`cqlsh -e "TRUNCATE <keyspace_name>.<table_name>"`
+
+For example:
+<br/>
+
+`cqlsh -e "TRUNCATE mykeyspace.team_players"`
 
 #### NOTE
-If you are restoring [encrypted backup files](https://docs.scylladb.com/manual/master/operating-scylla/security/encryption-at-rest.md), make sure Scylla Enterprise has the same keys used by Scylla to encrypt the data before starting the restore process.
+If you are restoring [encrypted backup files](https://docs.scylladb.com/manual/master/operating-scylla/security/encryption-at-rest.md), make sure ScyllaDB is configured with the same keys that were used to encrypt the data before starting the restore process.
+
+<a id="restore-object-storage"></a>
+
+## Restore from object storage
+
+Use this method to restore SSTables backed up to S3-compatible object storage with [nodetool backup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/backup.md). The node downloads the SSTables from the bucket and streams their contents to the nodes owning the data (load and stream), so the restore works regardless of cluster topology changes since the backup, and the cluster stays online.
+
+The object storage endpoint must be configured on the nodes, as described in [Configuring Object Storage](https://docs.scylladb.com/manual/master/operating-scylla/admin.md#object-storage-configuration).
+
+#### NOTE
+If the table has any [Materialized Views (MV)](https://docs.scylladb.com/manual/master/features/materialized-views.md) or [Secondary Indexes (SI)](https://docs.scylladb.com/manual/master/features/secondary-indexes.md), view updates are generated automatically as the base table data is streamed. Restore the base table SSTables only; restoring MV or SI SSTables is not supported and will fail.
+
+**Procedure**
+
+1. Complete the [prerequisites](#restore-prerequisites).
+2. List the backed-up SSTables in the bucket under the prefix used during the backup. The restore command takes the paths of the `TOC.txt` components of the SSTables to restore, **relative to the prefix** – the remainder of each object key after the prefix. Note that listing tools print full object keys, from the bucket root, so the prefix needs to be stripped. For example:
+   ```shell
+   aws s3 ls --recursive s3://bucket-foo/ks/cf/24601/ | awk '/-TOC.txt$/ { print $4 }' | sed 's|^ks/cf/24601/||'
+   ```
+3. Run [nodetool restore](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/restore.md), passing the endpoint, bucket, prefix, target keyspace and table, and the list of prefix-relative TOC paths:
+   ```shell
+   nodetool restore --endpoint s3.us-east-2.amazonaws.com --bucket bucket-foo --prefix ks/cf/24601 \
+     --keyspace ks --table cf \
+     me-3gdq_0bki_2dy4w2gqj6hoso4mw1-big-TOC.txt \
+     me-3gdq_0bki_2dipc1ysb2x2a3btgh-big-TOC.txt
+   ```
+
+   Alternatively, put the same prefix-relative TOC paths (newline-separated) in a file and pass it with the `--sstables-file-list` option:
+   ```shell
+   cat > sstables.list <<EOF
+   me-3gdq_0bki_2dy4w2gqj6hoso4mw1-big-TOC.txt
+   me-3gdq_0bki_2dipc1ysb2x2a3btgh-big-TOC.txt
+   EOF
+
+   nodetool restore --endpoint s3.us-east-2.amazonaws.com --bucket bucket-foo --prefix ks/cf/24601 \
+     --keyspace ks --table cf --sstables-file-list sstables.list
+   ```
+4. Monitor the restore. By default, the command waits for the restore to finish and reports its final status. With the `--nowait` option, it returns a task ID immediately; use the [nodetool tasks](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/tasks/index.md) commands to track progress or cancel the operation.
+
+**Speeding up the restore**
+
+A single `nodetool restore` invocation runs on one node, which downloads and streams all the listed SSTables. To parallelize the work, split the list of SSTables between the nodes and run `nodetool restore` on each of them. The `--scope` option (`node`, `rack`, `dc`, or `all`) constrains where each node streams the data, so that concurrent restores don’t stream the same partition to a replica more than once. See [nodetool restore](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/restore.md) for details on combining `--scope` with per-node SSTable lists.
+
+With the `--primary-replica-only` option, each partition is streamed only to its primary replica. This reduces the amount of streamed data, but you **must** run a full cluster repair after the restore completes to replicate the data to the remaining replicas: for vnode-based keyspaces, run [nodetool repair -pr](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/repair.md) on **every** node; for tablet-based keyspaces, run [nodetool cluster repair](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cluster/repair.md) on any single node.
+
+<a id="restore-load-and-stream"></a>
+
+## Restore with load and stream
+
+Use this method when the backed-up SSTable files are available on disk (for example, snapshot files copied back from external storage). The SSTables are read and their contents are streamed to the nodes owning the data, so the method works regardless of cluster topology changes since the backup. Each SSTable needs to be uploaded to only **one** node, any node, and the cluster stays online.
+
+#### NOTE
+If the table has any [Materialized Views (MV)](https://docs.scylladb.com/manual/master/features/materialized-views.md) or [Secondary Indexes (SI)](https://docs.scylladb.com/manual/master/features/secondary-indexes.md), view updates are generated automatically as the base table data is streamed. Upload the base table SSTables only; uploading MV or SI SSTables is not supported and will fail.
+
+**Procedure**
+
+1. Complete the [prerequisites](#restore-prerequisites).
+2. Copy the backed-up SSTable files of a table to that table’s `upload` directory on one of the nodes, and make sure the files are owned by the `scylla` user and group:
+   ```shell
+   sudo cp /path/to/backup/sstables/* /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000/upload/
+   sudo chown -R scylla:scylla /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000/upload/
+   ```
+
+   You can distribute the backup files between several nodes to parallelize the restore; make sure each SSTable is uploaded to only one node.
+3. Run [nodetool refresh](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/refresh.md) with the `--load-and-stream` option on each node holding uploaded files:
+   ```shell
+   nodetool refresh mykeyspace team_players --load-and-stream
+   ```
+
+   See [Load and Stream](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/refresh.md#nodetool-refresh-load-and-stream) for the `--scope` and `--primary-replica-only` options that constrain the set of target replicas. If `--primary-replica-only` is used, run a full cluster repair after the restore completes to replicate the data to the remaining replicas: for vnode-based keyspaces, run [nodetool repair -pr](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/repair.md) on **every** node; for tablet-based keyspaces, run [nodetool cluster repair](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cluster/repair.md) on any single node.
+
+<a id="restore-procedure"></a>
+
+## Restore to an identical cluster
+
+This method places the snapshot files directly back into the table directories and restarts the nodes.
+
+#### NOTE
+The following procedure assumes data is restored to the same cluster that was backed-up:
+
+- same number of nodes
+- same token range per node
+
+The procedure restores each node using the backup file of the **same node**.
+If this is not the case, use the [load and stream](#restore-load-and-stream) method described above instead. It works regardless of topology changes, but is slower than restoring to an identical cluster.
+
+This method is suitable for vnode-based keyspaces only. For [tablet-based](https://docs.scylladb.com/manual/master/architecture/tablets.md) keyspaces, use the [object storage](#restore-object-storage) or [load and stream](#restore-load-and-stream) method instead.
+
+Complete the [prerequisites](#restore-prerequisites) first.
 
 #### NOTE
 Best practise is **not** to restore [Materialized Views (MV)](https://docs.scylladb.com/manual/master/features/materialized-views.md) and [Secondary Indexes (SI)](https://docs.scylladb.com/manual/master/features/secondary-indexes.md) SSTables.
@@ -33526,6 +33793,8 @@ It is recommended to:
 - Drop the MV and SI using DROP MATERIALIZED VIEW or DROP INDEX
 - Restore the base table only (see below)
 - Recreate the  MV or SI, using the original description from the CQL backup, using CREATE MATERIALIZED VIEW or CREATE INDEX
+
+### Repeat the following steps for each node in the cluster:
 
 1. Run the [nodetool drain](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/drain.md) command to ensure the data is flushed to the SSTables
 2. Shut down the node
@@ -33589,11 +33858,14 @@ It is recommended to:
    ```shell
    sudo cp -r * /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000
    ```
-7. If you have incremental backup files, copy them from the **backups** folder `/var/lib/scylla/data/keyspace_name/table_name-UUID/backups/<backups_name>` to  the `/var/lib/scylla/data/keyspace_name/table_name-UUID/` directory
+
+   #### WARNING
+   Copying files into the table’s data directory is only allowed while the ScyllaDB service is **stopped**. To load SSTables into a running node, place them in the table’s `upload` directory and use [nodetool refresh](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/refresh.md) instead.
+7. If you have incremental backup files, copy them from the **backups** folder `/var/lib/scylla/data/keyspace_name/table_name-UUID/backups` to  the `/var/lib/scylla/data/keyspace_name/table_name-UUID/` directory
 
    For example:
    ```shell
-   sudo cp -r * /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000
+   sudo cp -r /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000/backups/* /var/lib/scylla/data/mykeyspace/team_players-6e856600017f11e790f4000000000000
    ```
 8. Make sure that all files are owned by the `scylla` user and group:
    ```shell
@@ -33612,9 +33884,8 @@ It is recommended to:
    ```
 
    (with *some-scylla* container already running)
-10. Run `nodetool repair` command to guarantee that your data is consistent with other nodes.
 
-After performing the above on all nodes, repair the cluster with nodetool repair. This makes sure that the data is consistent on all nodes and between each node.
+After performing the above on all nodes, run a full cluster repair: for vnode-based keyspaces, run [nodetool repair -pr](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/repair.md) on **every** node; for tablet-based keyspaces, run [nodetool cluster repair](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cluster/repair.md) on any single node; run both if you restored keyspaces of both kinds. This makes sure that the data is consistent on all nodes and between each node.
 
 
 # reverse-dns-sshd.md
@@ -35916,14 +36187,46 @@ scylla sstable <operation> <path to SStable>
 
 You can specify more than one SSTable.
 
-Additionally, the path to SSTable can point to an S3 fully qualified path in
-the form of s3://bucket-name/prefix/of/your/sstable/sstable-TOC.txt. To use
-this feature, you need to have AWS credentials set up in your environment.
-For more information, see [Configuring Object Storage](https://docs.scylladb.com/manual/master/operating-scylla/admin.md#object-storage-configuration).
+Additionally, the path to SSTable can point to an object storage fully qualified
+path in the form of `s3://bucket-name/prefix/of/your/sstable/sstable-TOC.txt`
+or `gs://bucket-name/prefix/of/your/sstable/sstable-TOC.txt`. This also
+supports live object-storage SSTables; see [SSTables on Object Storage]().
+To use this feature, you need to have object-storage credentials set up in your
+environment. For more information, see [Configuring Object Storage](https://docs.scylladb.com/manual/master/operating-scylla/admin.md#object-storage-configuration).
 
 Additionally, you must ensure the tool is able to load the correct scylla.yaml
 file, which can be done using the `--scylla-yaml-file` parameter or by
 placing the YAML file in one of the default locations the tool checks.
+
+## SSTables on Object Storage
+
+`scylla sstable` can read SSTables from S3 and Google Cloud Storage using
+fully qualified paths with the `s3://` or `gs://` scheme.
+
+Snapshot and backup layouts use regular SSTable component names that include
+the SSTable version, generation, and format, for example
+`me-3gqe_1lnj_4sbpc2ezoscu9hhtor-big-Data.db`. For these layouts, point the
+tool at any component path in that SSTable.
+
+Live object-storage keyspaces use a different layout. SSTable components are
+stored under `sstables/<sstable-id>/` and the component object names do not
+include the version, generation, or format:
+
+```text
+s3://bucket/sstables/<sstable-id>/Data.db
+s3://bucket/sstables/<sstable-id>/Index.db
+s3://bucket/sstables/<sstable-id>/TOC.txt
+```
+
+The same layout is used with `gs://` paths. In this layout, Scylla stores the
+SSTable version and format as object attributes named `version` and
+`format` on the `TOC.txt` object. `scylla sstable` uses these attributes
+to open the SSTable because the component name itself only contains the
+component suffix.
+
+The tool reads live object-storage SSTables in place; it does not download the
+full SSTable first. The `--scylla-yaml-file` configuration must contain a
+matching object-storage endpoint for the path scheme.
 
 <a id="scylla-sstable-schema"></a>
 
@@ -38100,12 +38403,16 @@ Where `mutation_source_kind` is one of:
 * `memtable`
 * `row-cache`
 * `sstable`
+* `logstor-cache`
+* `logstor-log`
 
 And the `mutation_source_id` is used to distinguish individual mutation sources of the same kind, where applicable:
 
 * `memtable` - a numeric id, starting from `0`
 * `row-cache` - N/A, there is only a single cache per table
 * `sstable` - the path of the sstable
+* `logstor-cache` - N/A, there is only a single cache per table
+* `logstor-log` - the path of the log file, followed by the id of the segment holding the record
 
 #### partition_region
 
