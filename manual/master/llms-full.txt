@@ -11772,13 +11772,9 @@ they should be easy to detect. Here is a list of these unimplemented features:
   [https://github.com/scylladb/scylla/issues/5036](https://github.com/scylladb/scylla/issues/5036)
 * The deprecated `KeyConditions` parameter of `Query` works only on
   single-attribute keys. Using it to query a composite GSI fails with a
-  `ValidationException`carrying this message:
-  ```default
-  Legacy KeyConditions are not supported for composite key GSIs in Alternator
-  ```
-
-  Use `KeyConditionExpression` instead - AWS recommends it for all new
-  applications anyway.
+  `ValidationException`. Use `KeyConditionExpression` instead - AWS
+  recommends it for all new applications anyway.
+  [https://github.com/scylladb/scylladb/issues/31393](https://github.com/scylladb/scylladb/issues/31393)
 * DynamoDB’s multi-item transaction feature (TransactWriteItems,
   TransactGetItems) is not supported. Note that the older single-item
   conditional updates feature are fully supported.
@@ -19462,7 +19458,8 @@ The `ALTER TABLE` statement can:
 - Remove column(s) from the table. This drops both the column and all its content, but note that while the column
   becomes immediately unavailable, its content is only removed lazily during compaction. Please also note the warnings
   below. Due to lazy removal, the altering itself is a constant (in the amount of data removed or contained in the
-  cluster) time operation.
+  cluster) time operation. A column that an index or a materialized view uses cannot be removed; drop the index or
+  the view first.
 - Change data type of the column to a compatible type.
 - Change some of the table options (through the `WITH` instruction). The [supported options](#create-table-options) are the same that when creating a table (outside of `COMPACT STORAGE` and `CLUSTERING
   ORDER` that cannot be changed after creation). Note that setting any `compaction` sub-options has the effect of
@@ -30700,12 +30697,20 @@ tablet load balancer rebalances the data.
 
 ### Keyspace and table configuration
 
-* The keyspace’s replication strategy must be the **NetworkTopologyStrategy**,
-  and its replication factor must equal the number of racks to ensure that the
-  keyspace will be [RF-rack-valid](https://docs.scylladb.com/manual/master/reference/glossary.md#term-RF-rack-valid-keyspace) after the
-  migration. If your configuration requires changes, see
-  [Update Topology Strategy From Simple to Network](https://docs.scylladb.com/manual/master/operating-scylla/procedures/cluster-management/update-topology-strategy-from-simple-to-network.md)
-  and [How to Safely Increase the Replication Factor](https://docs.scylladb.com/manual/master/kb/rf-increase.md).
+* The keyspace’s replication strategy must be the **NetworkTopologyStrategy**.
+  To change it, see
+  [Update Topology Strategy From Simple to Network](https://docs.scylladb.com/manual/master/operating-scylla/procedures/cluster-management/update-topology-strategy-from-simple-to-network.md).
+* In every datacenter, the keyspace’s replication factor must equal the number
+  of racks in that datacenter, to ensure that the keyspace will be
+  [RF-rack-valid](https://docs.scylladb.com/manual/master/reference/glossary.md#term-RF-rack-valid-keyspace) after the migration.
+  Racks that contain only [zero-token nodes](https://docs.scylladb.com/manual/master/architecture/zero-token-nodes.md)
+  are not counted. A datacenter can also have a replication factor of zero
+  (RF=0), in which case it holds no replicas of the keyspace. For example, a
+  keyspace with replication `{'dc1': 3, 'dc2': 2, 'dc3': 0}` can be migrated
+  if `dc1` has three racks and `dc2` has two racks. An
+  [arbiter datacenter](https://docs.scylladb.com/manual/master/operating-scylla/procedures/cluster-management/arbiter-dc.md),
+  which contains only zero-token nodes, must have RF=0. To change the
+  replication factor, see [How to Safely Increase the Replication Factor](https://docs.scylladb.com/manual/master/kb/rf-increase.md).
 * All tables in the keyspace should have `tombstone_gc` mode set to `repair`
   to prevent tombstone garbage collection from running during migration.
   For guidance, see [Tombstone Garbage Collection](https://docs.scylladb.com/manual/master/cql/ddl.md#ddl-tombstones-gc).
@@ -30714,11 +30719,6 @@ tablet load balancer rebalances the data.
 
 The current migration procedure has the following limitations:
 
-* **Multi-DC clusters** are supported, but every datacenter in the migrating
-  keyspace’s replication strategy must have a replication factor of at least one.
-  Datacenters with a replication factor of zero (RF=0) are not yet supported.
-* Clusters with [zero-token nodes](https://docs.scylladb.com/manual/master/architecture/zero-token-nodes.md) are
-  not yet supported.
 * **No schema changes** during the migration. Do not create, alter, or drop
   tables in the migrating keyspace until the migration is finished.
 * **No planned topology changes** during the migration. Do not add, remove,
@@ -37309,9 +37309,13 @@ You can specify more than one SSTable.
 
 A single directory can be passed in place of the individual SSTables in it –
 typically the table directory – in which case all the SSTables found in it are
-processed. Note that the data directory of a running node is a moving target:
-SSTables which are not sealed yet are left out, and ones deleted while being
-loaded are reported and skipped.
+processed. SSTables which are not sealed yet are left out.
+
+An SSTable with components missing fails the operation, whether it is named on
+the command line or found in a directory. Note that the data directory of a
+running node is a moving target: the node can delete an SSTable while the tool
+is loading it. Pass `--ignore-incomplete-sstables` to have such SSTables
+reported and skipped instead.
 
 Additionally, the path to SSTable can point to an object storage fully qualified
 path in the form of `s3://bucket-name/prefix/of/your/sstable/sstable-TOC.txt`
@@ -38358,7 +38362,9 @@ they live in a directory of the data dir or in a bucket of an object store. The
 data dir is the one `--scylla-data-dir` names, or the one the scylla.yaml
 configures. The system tables the SSTables of a table are looked up in have to
 be on disk: `nodetool flush system_schema`, and for a table on object storage
-`nodetool flush system sstables` as well. SSTables named on the command line
+`nodetool flush system sstables` as well. Describing the table of a running
+node usually needs `--ignore-incomplete-sstables`, as the node can delete
+SSTables, e.g. by compacting them, while they are being loaded. SSTables named on the command line
 are the ones described, `--keyspace` and `--table` then only saying which
 schema to load.
 
