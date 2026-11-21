@@ -360,6 +360,9 @@ This document highlights ScyllaDB’s key data modeling features.
   state and the history of all changes made to tables in the database.
 * [Workload Attributes](https://docs.scylladb.com/manual/master/features/workload-attributes.md) assigned to your workloads
   specify how ScyllaDB will handle requests depending on the workload.
+* [Workload Prioritization](https://docs.scylladb.com/manual/master/features/workload-prioritization.md) lets you
+  assign service levels to roles, so that each workload gets the share of
+  resources it needs.
 * [Backup and Restore](https://docs.scylladb.com/manual/master/features/backup-and-restore.md) allows you to create
   backups of your data and restore it when needed.
 * [Incremental Repair](https://docs.scylladb.com/manual/master/features/incremental-repair.md) provides a much more
@@ -526,6 +529,14 @@ Also check out the [Onboarding lesson](https://university.scylladb.com/courses/s
 Keep your versions up-to-date. The two latest versions are supported. Also, always install the latest patches for your version.
 
 
+            <div class="cell my-panel">
+                <div class="panel">
+                    <h5 class="panel_\_title">Managed Deployment</h5>
+            
+To run ScyllaDB as a fully managed service without installing it yourself, use ScyllaDB Cloud.
+See the [ScyllaDB Cloud documentation](https://cloud.docs.scylladb.com/stable/).
+
+</div></div>
             <div class="cell my-panel">
                 <div class="panel">
                     <h5 class="panel_\_title">Cloud Deployment</h5>
@@ -730,6 +741,8 @@ which makes them observable and controllable. Task manager operates per node.
 
 * [repair](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cluster/repair.md)  `<keyspace>` `<table>` - Repair one or more tablet tables.
 * [cleanup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cluster/cleanup.md)  - Clean up all non tablet (vnode-based) keyspaces in a cluster
+* [snapshot](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/snapshot.md) - Take a cluster-wide snapshot of keyspaces or tables.
+* [backup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/backup.md) - Back up a cluster-wide snapshot to object storage.
 
 
 # index.md
@@ -4760,10 +4773,10 @@ If `--nowait` flag is not set, the command relies on `user_task_ttl` internally.
 ```console
 nodetool [(-h <host> | --host <host>)] [(-p <port> | --port <port>)] cluster backup
             [--keyspaces <keyspace>]...
-            [--table <table>]
-            [--snapshot <snapshot>]
-            --location <dc>,<endpoint>,<bucket>(,<prefix>)
-            [--location <dc2>,<endpoint2>,<bucket2>(,<prefix2>)]...
+            [--table <table>[,<table>...]]
+            [(-s <snapshot> | --snapshot <snapshot>)]
+            (-l | --location) <dc>,<endpoint>,<bucket>[,<prefix>]
+            [(-l | --location) <dc2>,<endpoint2>,<bucket2>[,<prefix2>]]...
             [--nowait]
             [--move-files]
 ```
@@ -4777,10 +4790,10 @@ nodetool cluster backup --location mydc,s3.us-east-2.amazonaws.com,bucket-foo,fo
 ## Options
 
 * `-h <host>` or `--host <host>` - Node hostname or IP address.
-* `--keyspaces` - Name of a keyspace to copy SSTables from. Repeat for each keyspace. By default, all keyspaces are backed up
-* `--table` - Name of a table to copy SSTables from, or a comma-separated list of tables. Requires exactly one keyspace
-* `--snapshot` - Name of a snapshot to copy sstables from. If it does not exist, it is taken first
-* `--location` - Tuple of <dc>,<endpoint>,<bucket> and optional <prefix> which to write the backup. Repeat for each DC
+* `--keyspaces` - Keyspace to back up. Repeat for each keyspace. If omitted, all keyspaces are backed up.
+* `--table` - Table(s) to back up, multiple ones can be joined with `,`. Requires exactly one keyspace to be specified.
+* `-s` or `--snapshot` - Name of the snapshot to back up. It is created if it does not exist. If omitted, a new snapshot, named after the current timestamp, is taken.
+* `-l` or `--location` - Tuple of <dc>,<endpoint>,<bucket> and optional <prefix> which to write the backup to. Required; repeat it for each DC.
   Endpoints should be configured as per [the object storage configuration instructions](https://docs.scylladb.com/manual/master/operating-scylla/admin.md#object-storage-configuration).
 * `--nowait` - Don’t wait on the backup process
 * `--move-files` - Move files instead of copying them. This will delete the files from the local disk after they are uploaded to the object storage.
@@ -9400,7 +9413,7 @@ On every new CQL connection:
 
 # Nodetool cfhistograms (tablehistograms)
 
-**cfhistograms** `<keyspace> <cfname>`- This command provides statistics about a table, including number of SSTables, read/write latency, partition size and column count. cfhistograms covers all operations since the last time you ran the nodetool cfhistograms command. Note that this command can also be used for `tablehistograms`. This command uses the following syntax:
+**cfhistograms** `<keyspace> <cfname>`- This command provides statistics about a table, including number of SSTables, read/write latency, partition size and column count. Read/write latencies are computed over a recent moving window. Note that this command can also be used for `tablehistograms`. This command uses the following syntax:
 
 ```shell
 nodetool cfhistograms keyspaces cfname
@@ -9412,15 +9425,15 @@ For example: to get statistics about the `standard1` table in the `keyspaces1` k
 nodetool cfhistograms keyspaces1 standard1
 ```
 
-| Percentile   |   SSTables value |   Write Latency |   Read Latency |   Partition Size |   Cell Count |
-|--------------|------------------|-----------------|----------------|------------------|--------------|
-| 50%          |               10 |              42 |             20 |              210 |            5 |
-| 75%          |               20 |              42 |             24 |              280 |            5 |
-| 95%          |               25 |              42 |             42 |              300 |            5 |
-| 98%          |               25 |              42 |            770 |              310 |            5 |
-| 99%          |               26 |              42 |           2759 |              310 |            5 |
-| Min          |                0 |              36 |              7 |              210 |            5 |
-| Max          |               26 |              42 |          35425 |              310 |            5 |
+| Percentile   |   SSTables |   Write Latency |   Read Latency |   Partition Size |   Cell Count |
+|--------------|------------|-----------------|----------------|------------------|--------------|
+| 50%          |         10 |              42 |             20 |              210 |            5 |
+| 75%          |         20 |              42 |             24 |              280 |            5 |
+| 95%          |         25 |              42 |             42 |              300 |            5 |
+| 98%          |         25 |              42 |            770 |              310 |            5 |
+| 99%          |         26 |              42 |           2759 |              310 |            5 |
+| Min          |          0 |              36 |              7 |              210 |            5 |
+| Max          |         26 |              42 |          35425 |              310 |            5 |
 
 In this example, 95% of the write latency measurements were 42 microseconds (μs) or less, 95% of the read latencies were 42 μs or less, and 95% of the partitions are 300 bytes or less. The SSTables column means that the 95% of all single-key read requests touched at most 25 SSTables.
 
@@ -9599,6 +9612,7 @@ In addition, the following should be noted:
 - An optional keyspace and column family (table) can be specified to restrict the cleanup action.
 - If no keyspace is specified, it will perform cleanup in all keyspaces
 - There is no need to run cleanup when nodes are being removed permanently
+- Cleanup applies only to vnode-based keyspaces. Tablet keyspaces are cleaned up automatically and are skipped.
 
 For example:
 
@@ -9688,7 +9702,7 @@ In this case, the safest way is to stop the service, clean all of the data, and 
 
 # Nodetool clearsnapshot
 
-**clearsnapshot** `[-t tag] [<keyspace>]`- This command removes snapshots. By default all the snapshots will be removed unless a `snapshot_name` is provided.
+**clearsnapshot** `[-t <tag>] [<keyspace>...]`- This command removes snapshots. By default all the snapshots will be removed unless a `snapshot_name` is provided.
 
 For example:
 
@@ -10746,6 +10760,9 @@ nodetool [options] compact [<keyspace> [<cfnames>]...]
 
 ## Options
 
+* `--flush-memtables <true|false>` - Control flushing of tables before major compaction (`true` by default).
+* `--consider-only-existing-data <true|false>` - Check only the SSTables being compacted to garbage collect the tombstones and do not check memtables, commit log and other uncompacting SSTables (`false` by default). Enabling this will also force flush all memtables before starting major compaction.
+
 The following options are available in Cassandra’s nodetool, but are NOT implemented in ScyllaDB’s nodetool:
 
 * `-st` or `--start-token`
@@ -11558,7 +11575,8 @@ For example:
 Example output:
 
 ```yaml
-id                                     shard_id keyspace_name columnfamily_name compaction_name started_at              compacted_at            bytes_in bytes_out rows_merged   sstables_in                                                                                                                                                              sstables_out                                                                          total_tombstone_purge_attempt total_tombstone_purge_failure_due_to_overlapping_with_memtable total_tombstone_purge_failure_due_to_overlapping_with_uncompacting_sstable
+Compaction History:
+id                                     shard_id keyspace_name columnfamily_name compaction_type started_at              compacted_at            bytes_in bytes_out rows_merged   sstables_in                                                                                                                                                              sstables_out                                                                          total_tombstone_purge_attempt total_tombstone_purge_failure_due_to_overlapping_with_memtable total_tombstone_purge_failure_due_to_overlapping_with_uncompacting_sstable
 17536e70-5358-11e6-9d5f-000000000000          0 ks            test              Compact         2024-12-17T16:19:55.914 2024-12-17T16:39:55.914    11000      5583 {1: 78, 2: 6} [{generation: 2a5db691-bc8d-11ef-a5f9-bbbda77f5688, origin: memtable, size: 5468}, {generation: 28c58a60-bc8d-11ef-a5f9-bbbda77f5688, origin: memtable, size: 5532}]     [{generation: 2a5fb260-bc8d-11ef-a5f9-bbbda77f5688, origin: compaction, size: 5583}]  3                             0                                                              1
 4e164760-5354-11e6-9d5f-000000000000          1 ks            test              Compact         2024-12-17T16:19:55.913 2024-12-17T16:39:55.913    10919      5490 {1: 56, 2: 2} [{generation: 2a5db691-bc8d-11ef-ad72-bbbca77f5688, origin: memtable, size: 5433}, {generation: 28c58a60-bc8d-11ef-ad72-bbbca77f5688, origin: memtable, size: 5486}]     [{generation: 2a5f8b50-bc8d-11ef-ad72-bbbca77f5688, origin: compaction, size: 5490}]  1                             0                                                              0
 17abc7a0-5358-11e6-9710-000000000001          0 system        raft              Compact         2024-12-17T16:19:52.570 2024-12-17T16:39:52.570   102199     96181 {1: 20, 2: 3} [{generation: 285b08c0-bc8d-11ef-a5f9-bbbda77f5688, origin: memtable, size: 13683}, {generation: 2798ca30-bc8d-11ef-a5f9-bbbda77f5688, origin: compaction, size: 88516}] [{generation: 28614a50-bc8d-11ef-a5f9-bbbda77f5688, origin: compaction, size: 96181}] 1                             0                                                              0
@@ -11574,7 +11592,7 @@ Explanation:
 | shard_id                                                                   | id of the shard the compaction was executed on                                                         |
 | keyspace_name                                                              | keyspace name that the compaction performed on                                                         |
 | columnfamily_name                                                          | columnfamily name that the compaction performed on                                                     |
-| compaction_type                                                            | type of compaction, e.g. major, regular, reshard, cleanup, etc.                                        |
+| compaction_type                                                            | type of compaction, e.g. Compact, Major, Cleanup, Reshard, Reshape, Scrub, etc.                        |
 | started_at                                                                 | timestamp when the compaction started                                                                  |
 | compacted_at                                                               | timestamp when the compaction completed                                                                |
 | bytes_in                                                                   | SSTable size before the compaction                                                                     |
@@ -11621,6 +11639,16 @@ are left out.
 
 **compactionstats** - Displays statistics for compactions. Each row represents a running compaction.
 
+## Syntax
+
+```console
+nodetool compactionstats [(-H | --human-readable)]
+```
+
+## Options
+
+* `-H` or `--human-readable` - Display bytes in human readable form, i.e. KiB, MiB, GiB, TiB.
+
 For example:
 
 ```shell
@@ -11631,21 +11659,27 @@ Example output:
 
 ```shell
 pending tasks: 2
-compaction type  keyspace   column family   completed      total         unit   progress
-major            nba        player_name     5770708712     55239418023   bytes  10.11%
-minor            nba        player_stats    18569428       3610548974    bytes  51.43%
+- nba.player_name: 1
+- nba.player_stats: 1
+
+id                                   compaction type keyspace table        completed  total       unit  progress
+9a1b2c30-5358-11e6-9d5f-000000000000 MAJOR           nba      player_name  5770708712 55239418023 bytes 10.45%
+9a1b2c31-5358-11e6-9d5f-000000000000 COMPACTION      nba      player_stats 18569428   3610548974  bytes 0.51%
+Active compaction remaining time :        n/a
 ```
 
-| Parameter             | Description                      |
-|-----------------------|----------------------------------|
-| pending tasks         | Number of pending compactions    |
-| compaction type       | Type of compaction               |
-| keyspace              | The keyspace name                |
-| column family (table) | The column family (table) name   |
-| completed             | Completed bytes out of the total |
-| total                 | Total size of the compaction     |
-| unit                  | Compaction unit type             |
-| progress              | Compaction progress %            |
+| Parameter                        | Description                                                                                                     |
+|----------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| pending tasks                    | Number of pending compactions, followed by the number of pending compactions per table                          |
+| id                               | The ID of the compaction task                                                                                   |
+| compaction type                  | Type of compaction                                                                                              |
+| keyspace                         | The keyspace name                                                                                               |
+| table                            | The table name                                                                                                  |
+| completed                        | Completed bytes out of the total                                                                                |
+| total                            | Total size of the compaction                                                                                    |
+| unit                             | Compaction unit type                                                                                            |
+| progress                         | Compaction progress %                                                                                           |
+| Active compaction remaining time | Estimated time to finish the running compactions at the configured compaction throughput (`n/a` if unthrottled) |
 
 [Nodetool Reference](https://docs.scylladb.com/manual/master/operating-scylla/nodetool.md)
 
@@ -18733,6 +18767,11 @@ over the limits of certain file systems). By default, keyspace and table names a
 equivalent to `mytable`), but case sensitivity can be forced by using double-quotes (`"myTable"` is different from
 `mytable`).
 
+#### NOTE
+We recommend using lowercase keyspace and table names. If you create a keyspace or table with a quoted name
+that contains uppercase letters (for example, `"MyKeyspace"`), you need to use double quotes and the exact
+case every time you refer to it, and some tools and drivers may not handle such names correctly.
+
 Further, a table is always part of a keyspace, and a table name can be provided fully-qualified by the keyspace it is
 part of. If it is not fully-qualified, the table is assumed to be in the *current* keyspace (see [USE statement](#use-statement)).
 
@@ -18764,7 +18803,7 @@ create_keyspace_statement: CREATE KEYSPACE [ IF NOT EXISTS ] `keyspace_name` [ W
 For example:
 
 ```cql
-CREATE KEYSPACE Excalibur
+CREATE KEYSPACE excalibur
 WITH replication = {'class': 'NetworkTopologyStrategy', 'DC1' : ['RAC1', 'RAC2', 'RAC3'], 'DC2' : 3}
 AND durable_writes = true;
 ```
@@ -20823,6 +20862,7 @@ nodetool describecluster
 Cluster Information:
      Name: Test Cluster
      Snitch: org.apache.cassandra.locator.SimpleSnitch
+     DynamicEndPointSnitch: disabled
      Partitioner: org.apache.cassandra.dht.Murmur3Partitioner
      Schema versions:
              86a67fc7-1d7c-3dc3-9be9-9c86b27e2506: [172.17.0.2]
@@ -21017,10 +21057,10 @@ nodetool disableautocompaction [<keyspace> [<tables>...]]
 
 nodetool disableautocompaction takes the following parameters:
 
-| Parameter Name   | Description                                                                                                                                                                                              |
-|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `<keyspace>`     | The keyspace to operate on.  If omitted, auto-compaction will be disabled in all keyspaces.                                                                                                              |
-| `<tables>...`    | A comma-separated list of one or more tables to operate on.  Tables may be specified only if a keyspace is given.  If omitted, auto-compaction will be disabled in all tables in the specified keyspace. |
+| Parameter Name   | Description                                                                                                                                                                                         |
+|------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `<keyspace>`     | The keyspace to operate on.  If omitted, auto-compaction will be disabled in all keyspaces.                                                                                                         |
+| `<tables>...`    | One or more tables to operate on, separated by spaces.  Tables may be specified only if a keyspace is given.  If omitted, auto-compaction will be disabled in all tables in the specified keyspace. |
 
 [Nodetool Reference](https://docs.scylladb.com/manual/master/operating-scylla/nodetool.md)
 
@@ -21064,7 +21104,7 @@ For example:
 
 `nodetool disablebinary`
 
-To verify the gossip status run `nodetool statusbinary`  Result will be `not running`
+To verify the CQL native transport status run `nodetool statusbinary`  Result will be `not running`
 
 See also
 
@@ -21606,10 +21646,10 @@ nodetool enableautocompaction [<keyspace> [<tables>...]]
 
 nodetool enableautocompaction takes the following parameters:
 
-| Parameter Name   | Description                                                                                                                                                                                             |
-|------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `<keyspace>`     | The keyspace to operate on.  If omitted, auto-compaction will be enabled in all keyspaces.                                                                                                              |
-| `<tables>...`    | A comma-separated list of one or more tables to operate on.  Tables may be specified only if a keyspace is given.  If omitted, auto-compaction will be enabled in all tables in the specified keyspace. |
+| Parameter Name   | Description                                                                                                                                                                                        |
+|------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `<keyspace>`     | The keyspace to operate on.  If omitted, auto-compaction will be enabled in all keyspaces.                                                                                                         |
+| `<tables>...`    | One or more tables to operate on, separated by spaces.  Tables may be specified only if a keyspace is given.  If omitted, auto-compaction will be enabled in all tables in the specified keyspace. |
 
 [Nodetool Reference](https://docs.scylladb.com/manual/master/operating-scylla/nodetool.md)
 
@@ -21655,7 +21695,7 @@ For example:
 
 `nodetool enablebinary`
 
-To verify the gossip status run `nodetool statusbinary`  Result will be `running`
+To verify the CQL native transport status run `nodetool statusbinary`  Result will be `running`
 
 See also
 
@@ -23957,7 +23997,7 @@ Data ownership is not changed, and the nodes are still cluster members,
 so have to be eventually removed or replaced.
 
 After nodes are excluded, there is no need to pass them in the list of ignored
-nodes to removnenode, replace, or repair.
+nodes to removenode, replace, or repair.
 
 ## Prerequisites
 
@@ -25489,7 +25529,7 @@ See also
 # Nodetool getendpoints
 
 **getendpoints** - `<keyspace>` `<table>` `<key>`- Print the end-points IP or name of the nodes that own the partition key.
-**getendpoints** - `<keyspace>` `<table>` `<key-components>` - Print the end-points IP or name of the nodes that own the partition key.
+**getendpoints** - `<keyspace>` `<table>` `--key-components <component>` [`--key-components <component>` …] - Print the end-points IP or name of the nodes that own the partition key.
 
 Use this command to know which node holds the specific partition key.
 
@@ -25525,7 +25565,7 @@ CREATE TABLE superheroes (
 ```
 
 ```bash
-nodetool getendpoints "superheroes" "peter"
+nodetool getendpoints "mykeyspace" "superheroes" "peter"
 ```
 
 This retrieves the nodes responsible for the partition key `peter` in the `superheroes` table.
@@ -26214,20 +26254,21 @@ nodetool gossipinfo
 Example output
 
 ```shell
- generation:1525599034
- heartbeat:229478
- X1:RANGE_TOMBSTONES,LARGE_PARTITIONS,COUNTERS,DIGEST_MULTIPARTITION_READ,CORRECT_COUNTER_ORDER,SCHEMA_TABLES_V3,CORRECT_NON_COMPOUND_RANGE_TOMBSTONES
- RPC_ADDRESS:172.17.0.2
- NET_VERSION:0
- X3:3
- DC:datacenter1
-X2:cycling.race_times:0.000000;system_traces.node_slow_log_time_idx:0.000000;system_traces.node_slow_log:0.000000;system_traces.events:0.000000;system_traces.sessions_time_idx:0.000000;nba.omg:0.000000;system_traces.sessions:0.000000;nba.race_times:0.000000;
- RACK:rack1
- LOAD:1.05442e+06
- RELEASE_VERSION:3.0.8
- SCHEMA:cd38cba0-57e1-35c7-a845-ebb02070d13b
- HOST_ID:01df8fc9-ddc4-4179-ab4c-a1b2223ad84e
- STATUS:NORMAL,983672177588923514
+/172.17.0.2
+  generation:1525599034
+  heartbeat:229478
+  SUPPORTED_FEATURES:RANGE_TOMBSTONES,LARGE_PARTITIONS,COUNTERS,DIGEST_MULTIPARTITION_READ,CORRECT_COUNTER_ORDER,SCHEMA_TABLES_V3,CORRECT_NON_COMPOUND_RANGE_TOMBSTONES
+  RPC_ADDRESS:172.17.0.2
+  NET_VERSION:0
+  SCHEMA_TABLES_VERSION:3
+  DC:datacenter1
+  CACHE_HITRATES:cycling.race_times:0.000000;system_traces.node_slow_log_time_idx:0.000000;system_traces.node_slow_log:0.000000;system_traces.events:0.000000;system_traces.sessions_time_idx:0.000000;nba.omg:0.000000;system_traces.sessions:0.000000;nba.race_times:0.000000;
+  RACK:rack1
+  LOAD:1.05442e+06
+  RELEASE_VERSION:3.0.8
+  SCHEMA:cd38cba0-57e1-35c7-a845-ebb02070d13b
+  HOST_ID:01df8fc9-ddc4-4179-ab4c-a1b2223ad84e
+  STATUS:NORMAL,983672177588923514
 ```
 
 [Nodetool Reference](https://docs.scylladb.com/manual/master/operating-scylla/nodetool.md)
@@ -26476,6 +26517,10 @@ protection from large data shapes is worth the additional write-path overhead.
 
 Hard-limit violations reject the write. Hard-limit failures are
 returned to the client as an `InvalidRequestException`.
+
+A hint for a write that a replica rejects is discarded instead of being
+retried. If other replicas accepted the write, repair copies it to the
+replica that rejected it.
 
 Soft-limit violations are logged by the `large_data` logger. If
 `large_data_cql_warnings` is enabled, ScyllaDB also returns a CQL protocol
@@ -26900,6 +26945,8 @@ With the incremental repair feature, the repaired and unrepaired SSTables are co
 cluster, such as uptime, load, key cache hit rate, the total count of all
 exceptions, and more. If needed, you can specify which node to view by
 using the `--host` argument with the host IP address.
+Use `-T` or `--tokens` to print all the tokens owned by the node,
+instead of just their count.
 
 For example:
 
@@ -26917,14 +26964,15 @@ Native Transport active: true
 Load                   : 294.44 MiB
 Generation No          : 1474434958
 Uptime (seconds)       : 1868
-Heap Memory (MiB)      : 39.21 / 247.50
+Heap Memory (MiB)      : 0.00 / 0.00
 Off Heap Memory (MiB)  : 7.74
 Data Center            : us-east
 Rack                   : 1b
 Exceptions             : 0
-Key Cache              : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, 0 recent hit rate, 0 save period in seconds
+Key Cache              : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, 0.000 recent hit rate, 0 save period in seconds
 Row Cache              : entries 1064771, size 1.02 MiB, capacity 450.80 MiB, 96 hits, 120 requests, 0.800 recent hit rate, 0 save period in seconds
 Counter Cache          : entries 0, size 0 bytes, capacity 0 bytes, 0 hits, 0 requests, 0.000 recent hit rate, 0 save period in seconds
+Percent Repaired       : 0.0%
 Token                  : (invoke with -T/--tokens to see all 256 tokens)
 ```
 
@@ -28699,7 +28747,7 @@ An operation may be repeated if appropriate flags are set.
 ## Syntax
 
 ```console
-nodetool tasks list <module> [--internal] [(--keyspace <keyspace> | -ks <keyspace>)]
+nodetool tasks list <module> [--internal] [--keyspace <keyspace>]
 [(--table <table> | -t <table>)] [--interval <time_in_seconds>] [(--iterations <number> | -i <number>)]
 ```
 
@@ -28707,23 +28755,23 @@ nodetool tasks list <module> [--internal] [(--keyspace <keyspace> | -ks <keyspac
 
 * `--internal` - if set, internal tasks are listed. Internal tasks are the ones that
   have a parent or cover an operation that is invoked internally.
-* `--keyspace` or `-ks` - shows only tasks on the specified keyspace.
+* `--keyspace` - shows only tasks on the specified keyspace.
 * `--table` or `-t` - shows only tasks on the specified table.
-* `--interval` - repeats the operation periodically at specified time intervals.
-* `--iterations` or `-i` - repeats the operation specified number of times.
+* `--interval` - interval in seconds between repetitions (default 10); only takes effect with `--iterations`.
+* `--iterations` or `-i` - number of times to re-print the list (default 0).
 
 For example:
 
 Shows all repair tasks on keyspace myks and table mytable:
 
 ```shell
-> nodetool tasks list repair --internal -ks myks --table mytable
+> nodetool tasks list repair --internal --keyspace myks --table mytable
 ```
 
 Shows all non-internal compaction tasks and repeats the operation 3 times every 5 seconds:
 
 ```shell
-> nodetool tasks list compaction --interval 5 --i 3
+> nodetool tasks list compaction --interval 5 -i 3
 ```
 
 ## Example output
@@ -28758,7 +28806,7 @@ d8926ee7-0faf-47b7-bfeb-82477e0c7b33 repair node keyspace running 5             
 # Nodetool listsnapshots
 
 **listsnapshots** - Lists all the snapshots along with the size on disk and true size.
-Dropped tables (column family) will not be part of the `listsnapshots`.
+Snapshots of dropped tables (for example, the automatic snapshot taken on `DROP TABLE`) are also listed.
 
 For example:
 
@@ -28766,20 +28814,21 @@ For example:
 nodetool listsnapshots
 
 Snapshot Details:
-Snapshot Name  Keyspace   Column Family  True Size   Size on Disk
+Snapshot name Keyspace name Column family name True size Size on disk
+5487138454987 nba           player_name        0 bytes   308.66 MiB
+2157384283120 nba           player_team        0 bytes   107.21 MiB
+4824891793663 nba           player_stats       0 bytes   41.69 MiB
 
-5487138454987  nba        player_name    0 bytes     308.66 MiB
-2157384283120  nba        player_team    0 bytes     107.21 MiB
-4824891793663  nba        player_stats   0 bytes      41.69 MiB
+Total TrueDiskSpaceUsed: 0 bytes
 ```
 
-| Parameter     | Description                                                |
-|---------------|------------------------------------------------------------|
-| Snapshot Name | Name of the snapshot                                       |
-| Keyspace      | Keyspace name                                              |
-| Column Family | Column Family (table) name                                 |
-| True Size     | Total size of all SSTables which are not backed up to disk |
-| Size on Disk  | Total size of the snapshot on disk                         |
+| Parameter          | Description                                                                                                                       |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| Snapshot name      | Name of the snapshot                                                                                                              |
+| Keyspace name      | Keyspace name                                                                                                                     |
+| Column family name | Column Family (table) name                                                                                                        |
+| True size          | Total size of the snapshot files that are not shared with the table’s current SSTables, i.e. disk space used only by the snapshot |
+| Size on disk       | Total size of the snapshot on disk                                                                                                |
 
 For example:
 
@@ -29253,7 +29302,7 @@ considered present:
 +-------------+-----+------+------+------+
 ```
 
-It is OK to us a comparison with `NULL` in a condition.
+It is OK to use a comparison with `NULL` in a condition.
 But since `NULL` value and missing value in ScyllaDB are
 indistinguishable, conditions which compare with `NULL`
 will return the same result when applied to both
@@ -30254,8 +30303,15 @@ such as Apache Cassandra, or from other ScyllaDB clusters:
                 <div class="panel">
                     <h5 class="panel_\_title">Migration Tools</h5>
             * [Migration tools overview](https://docs.scylladb.com/manual/master/using-scylla/mig-tool-review.md) - Overview of all tools available.
-* [Spark Migrator](https://github.com/scylladb/scylla-migrator) - for  migrating from CQL to CQL
+* [ScyllaDB Migrator](https://migrator.docs.scylladb.com/) - for migrating from CQL to CQL and from DynamoDB to ScyllaDB Alternator
 * [SSTable Loader](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/sstableloader.md) - for migrating SSTables to CQL
+
+</div></div>
+            <div class="cell my-panel">
+                <div class="panel">
+                    <h5 class="panel_\_title">Migrate from DynamoDB</h5>
+            * [Migrate from DynamoDB to ScyllaDB](https://developers.scylladb.com/stable/getting-started/dynamodb/guides/migration/index.html) - Migration guide for moving DynamoDB applications to ScyllaDB Alternator
+* [Migrate from DynamoDB with ScyllaDB Migrator](https://migrator.docs.scylladb.com/stable/migrate-from-dynamodb.html) - How to migrate DynamoDB tables to ScyllaDB Alternator with ScyllaDB Migrator
 
 </div></div>
 
@@ -31688,7 +31744,9 @@ The `nodetool` utility provides a simple command-line interface to the following
 
 ## Nodetool generic options
 
-* `-p <port>` or `--port <port>` - The port of the REST API of the ScyllaDB node.
+* `-h <host>` or `--host <host>` - The hostname or IP address of the ScyllaDB node (default: `localhost`).
+* `-p <port>` or `--port <port>` - The port of the REST API of the ScyllaDB node (default: `10000`).
+* `--rest-api-port <port>` - The port of the REST API of the ScyllaDB node; takes precedence over `--port`.
 * `--` - Separates command-line options from the list of argument(useful when an argument might be mistaken for a command-line option).
 
 ## Supported Nodetool operations
@@ -31730,14 +31788,15 @@ Operations that are not listed below are currently not available.
 * [help](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/help.md) - Display list of available nodetool commands.
 * [info](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/info.md) - Print node information
 * [listsnapshots](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/listsnapshots.md) - Lists all the snapshots along with the size on disk and true size.
-* **move** `<new token>`- Move node on the token ring to a new token
+* [migrate-to-tablets](https://docs.scylladb.com/manual/master/operating-scylla/procedures/config-change/migrate-vnodes-to-tablets.md) - Manage vnodes-to-tablets migration (subcommands: start, upgrade, downgrade, status, finalize).
+* **move** - Not supported.
 * **netstats** - Print network information on provided host (connecting node by default)
 * [proxyhistograms](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/proxyhistograms.md) - Print statistic histograms for network operations
 * [rebuild](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/rebuild.md) `[<src-dc-name>]`- Rebuild data by streaming from other nodes
 * [refresh](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/refresh.md)- Load newly placed SSTables to the system without restart
 * [removenode](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/removenode.md)- Remove node with the provided ID
 * [repair](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/repair.md)  `<keyspace>` `<table>` - Repair one or more vnode tables.
-* [resetlocalschema](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/resetlocalschema.md) - Reset the node’s local schema.
+* [resetlocalschema](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/resetlocalschema.md) - Reset the node’s local schema (no longer supported).
 * [restore](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/restore.md) - Load SSTables from a designated bucket in object store into a specified keyspace or table
 * [ring](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/ring.md) - The nodetool ring command display the token ring information.
 * [scrub](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/scrub.md) `[-m mode] [--no-snapshot] <keyspace> [<table>...]` - Scrub the SSTable files in the specified keyspace or table(s)
@@ -31755,9 +31814,9 @@ Operations that are not listed below are currently not available.
 * **tablehistograms** see [cfhistograms](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cfhistograms.md)
 * [tablestats](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/tablestats.md) - Provides in-depth diagnostics regard table.
 * [tasks](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/tasks/index.md) - Manage tasks manager tasks.
-* [toppartitions](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/toppartitions.md) - Samples cluster writes and reads and reports the most active partitions in a specified table and time frame.
+* [toppartitions](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/toppartitions.md) - Samples the writes and reads on the node and reports the most active partitions in the specified table(s) and time frame.
 * [upgradesstables](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/upgradesstables.md) - Upgrades each table that is not running the latest ScyllaDB version, by rewriting SSTables.
-* [version](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/version.md) - Print the DB version.
+* [version](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/version.md) - Print the Apache Cassandra version that ScyllaDB is most compatible with (not the ScyllaDB version).
 * [viewbuildstatus](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/viewbuildstatus.md) - Shows the progress of a materialized view build.
 
 
@@ -32524,23 +32583,26 @@ For example:
 nodetool proxyhistograms
 
 proxy histograms
-Percentile      Read Latency     Write Latency     Range Latency
-                 (micros)          (micros)          (micros)
-50%                   353.50           1214.50           4103.00
-75%                   972.50           2969.25           5073.25
-95%                  4832.85          15394.80          14981.50
-98%                  8181.18          21873.00          27640.50
-99%                  8356.63          21873.00          31843.79
-Min                    22.00            207.00            499.00
-Max                  8365.00          21873.00         208960.00
+Percentile       Read Latency      Write Latency      Range Latency   CAS Read Latency  CAS Write Latency View Write Latency
+                     (micros)           (micros)           (micros)           (micros)           (micros)           (micros)
+50%                    353.50            1214.50            4103.00               0.00               0.00               0.00
+75%                    972.50            2969.25            5073.25               0.00               0.00               0.00
+95%                   4832.85           15394.80           14981.50               0.00               0.00               0.00
+98%                   8181.18           21873.00           27640.50               0.00               0.00               0.00
+99%                   8356.63           21873.00           31843.79               0.00               0.00               0.00
+Min                     22.00             207.00             499.00               0.00               0.00               0.00
+Max                   8365.00           21873.00          208960.00               0.00               0.00               0.00
 ```
 
-| Parameter     | Description                     |
-|---------------|---------------------------------|
-| Percentile    | Latency rank                    |
-| Read Latency  | Read latency                    |
-| Write Latency | Write latency                   |
-| Range Latency | Range scan latency for the node |
+| Parameter          | Description                            |
+|--------------------|----------------------------------------|
+| Percentile         | Latency rank                           |
+| Read Latency       | Read latency                           |
+| Write Latency      | Write latency                          |
+| Range Latency      | Range scan latency for the node        |
+| CAS Read Latency   | LWT (Paxos) read latency               |
+| CAS Write Latency  | LWT (Paxos) write latency              |
+| View Write Latency | Materialized view update write latency |
 
 [Nodetool Reference](https://docs.scylladb.com/manual/master/operating-scylla/nodetool.md)
 
@@ -33058,7 +33120,7 @@ If the table has any [Materialized Views (MV)](https://docs.scylladb.com/manual/
 ## Local refresh
 
 #### NOTE
-This mode is not supported for [tablets](https://docs.scylladb.com/manual/master/architecture/tablets.md).
+This mode is not supported for [tablets](https://docs.scylladb.com/manual/master/architecture/tablets.md). For tablet keyspaces, `nodetool refresh` automatically uses [load-and-stream](#nodetool-refresh-load-and-stream) instead.
 
 SSTables are copied from the upload directory to the table’s data directory and added to the table’s SSTable registry.
 
@@ -33096,7 +33158,7 @@ The `--scope` and `--primary-replica-only` options can be used to filter the set
 Syntax:
 
 ```default
-nodetool refresh <my_keyspace> <my_table> [(--load-and-stream | -las) [[(--primary-replica-only | -pro)] | [--scope <scope>]]]
+nodetool refresh <my_keyspace> <my_table> [(--load-and-stream | -las) [(--primary-replica-only | -pro)] [--scope <scope>]]
 ```
 
 ### Filter target replicas
@@ -33106,7 +33168,7 @@ This can be inefficient in a large cluster, especially if there are multiple Dat
 Constraining the subset of replicas where data will be streamed to allows orchestrating concurrent upload to multiple nodes without duplicate work – the same partition being streamed to a replica from multiple source nodes.
 
 There are two options available to manipulate the replica(s) to stream data to: `--primary-replica-only` and `--scope`.
-The two are mutually exclusive.
+The two can be combined, in which case each partition is streamed to its primary replica within the given scope. `--primary-replica-only` cannot be combined with `--scope node`.
 
 The `--primary-replica-only` (or `-pro`) option makes ScyllaDB only stream each partition to its primary replica.
 After all SSTables are uploaded to the cluster, a repair is required to replicate data to all replicas.
@@ -33335,8 +33397,6 @@ To only mark the node as permanently down without doing actual removal, use [nod
 nodetool excludenode <Host ID of the node>
 ```
 
-<a id="removenode-ignore-dead-nodes"></a>
-
 It’s allowed to invoke `nodetool removenode` on multiple nodes in parallel. This will be faster than doing
 it sequentially if there is significant amount of data in tablet-based keyspaces, because
 tablets which belong to removed nodes will be rebuilt in parallel. Node removal first migrates tablets to new
@@ -33347,6 +33407,8 @@ those from other removenode operations.
 Removenode which is still in the tablet rebuild phase can be canceled using Task Manager API.
 Tablets which are already rebuilt will remain on their new replicas.
 See [Task manager](https://docs.scylladb.com/manual/master/operating-scylla/admin-tools/task-manager.md).
+
+<a id="removenode-ignore-dead-nodes"></a>
 
 ## Ignoring Dead Nodes
 
@@ -33442,14 +33504,14 @@ ScyllaDB nodetool repair command supports the following options:
   nodetool repair -dc US_DC
   nodetool repair --in-dc US_DC
   ```
-- `-et` `--end-token` executes a repair on the specified node/s starting with the first token and ending with the specified UUID token.
+- `-et` `--end-token` executes a repair on the specified node/s starting with the first token and ending with the specified token.
 
   For example:
   ```default
   nodetool repair -et 90874935784
   nodetool repair --end-token 90874935784
   ```
-- `-hosts` `--in-hosts` syncs the **repair master** data subset only between a list of nodes, using host ID or Address. The list *must* include the **repair master**.
+- `-hosts` `--in-hosts` syncs the **repair master** data subset only between a list of nodes, using their IP addresses. The list *must* include the **repair master**.
 
   #### WARNING
   this command leaves part of the data subset (on nodes that are *not* listed) out of sync.
@@ -33458,7 +33520,6 @@ ScyllaDB nodetool repair command supports the following options:
   ```default
   nodetool repair -hosts 172.17.0.2,172.17.0.3,172.17.0.4
   nodetool repair --in-hosts 172.17.0.2,172.17.0.3,172.17.0.4
-  nodetool repair --in-hosts cdc295d7-c076-4b07-af69-1385fefdb40b,2dbdf288-9e73-11ea-bb37-0242ac130002,3a5993f8-9e73-11ea-bb37-0242ac130002
   ```
 - `-local` `--in-local-dc` executes a repair on the nodes in the local datacenter only.
 
@@ -33467,7 +33528,7 @@ ScyllaDB nodetool repair command supports the following options:
   nodetool repair -local
   nodetool repair --in-local-dc
   ```
-- `-pr` `--partitioner-range` executes a repair only on the primary replica returned by the partitioner.
+- `-pr` `--partitioner-range` repairs only the token ranges for which this node is the primary replica. Run it on all nodes to repair the whole cluster.
 
   For example:
   ```default
@@ -33479,7 +33540,7 @@ ScyllaDB nodetool repair command supports the following options:
   For example:
   ```default
   nodetool repair -st 10474535988
-  nodetool repair --start-token
+  nodetool repair --start-token 10474535988
   ```
 - `keyspace` executes a repair on a specific keyspace. The default is all keyspaces.
 
@@ -33532,7 +33593,7 @@ ScyllaDB nodetool cluster repair command supports the following options:
   For example:
   ```default
   nodetool cluster repair -dc US_DC
-  nodetool cluster repair --in-dc US_DC, EU_DC
+  nodetool cluster repair --in-dc US_DC,EU_DC
   ```
 - `-hosts` `--in-hosts` syncs the data only between a list of nodes, using host ID.
 
@@ -33547,7 +33608,7 @@ ScyllaDB nodetool cluster repair command supports the following options:
 - `--tablet-tokens` selects which tablets to repair. When the listed token belongs to a tablet, the whole tablet that owns the token will be repaired. By default, all tablets are repaired.
 
   #### WARNING
-  this command leaves part of the data subset (on nodes that are *not* listed) out of sync.
+  this command leaves the data of tablets that are *not* selected out of sync.
 
   For example:
   ```default
@@ -34305,14 +34366,9 @@ If you have not done so already, supply ScyllaDB support with the UUID. Keep in 
 
 # Nodetool resetlocalschema
 
-This command reloads in-memory schema objects from disk. It recalculates
-the per-node and per-table schema versions. This can help you solve some
-cases of schema version disagreement that would otherwise require a node restart.
-
-#### NOTE
-This command cannot be used to hot-update the node’s schema from manually
-placed schema SStables. If the schema on disk doesn’t match the schema in
-memory, such reload will likely fail.
+This command is no longer supported. Schema version recalculation was removed
+from ScyllaDB, and the command fails with
+`Schema version recalculation is no longer supported`.
 
 ## Syntax
 
@@ -34408,12 +34464,13 @@ When you run a restore operation, it always executes as a background task. You h
 
 ```console
 nodetool [(-h <host> | --host <host>)] [(-p <port> | --port <port>)]
-            --endpoint <endpoint> --bucket <bucket>
+            restore --endpoint <endpoint> --bucket <bucket>
             --prefix <prefix>
             --keyspace <keyspace>
             --table <table>
             [--nowait]
             [--scope <scope>]
+            [--primary-replica-only]
             [--sstables-file-list <file>]
             <sstables>...
 ```
@@ -34931,12 +34988,14 @@ If you do not follow the procedure above, you may start reading stale or null da
 
 # Nodetool ring
 
-**ring** `[<keyspace>] [<table>]` - The nodetool ring command displays the token
+**ring** `[(-r | --resolve-ip)] [<keyspace>] [<table>]` - The nodetool ring command displays the token
 ring information. The token ring is responsible for managing the
 partitioning of data within the ScyllaDB cluster. This command is
 critical if a cluster is facing data consistency issues.
 
 By default, `ring` command shows all keyspaces.
+
+Use `-r` or `--resolve-ip` to show node host names instead of IP addresses.
 
 For example:
 
@@ -34948,11 +35007,11 @@ This will show all the nodes that are involved in the ‘ring’ and the
 tokens that are assigned to each one of them. It will also show the
 status of each of the nodes.
 
-| Address     | Rack   | Status   | State   | Load       | Owns      |               Token |
-|-------------|--------|----------|---------|------------|-----------|---------------------|
-| 172.30.0.64 | 1b     | Up       | Normal  | 551.31 MiB | Mykespace | 1006916943685901788 |
-| 172.30.0.62 | 1b     | Up       | Normal  | 541.59 MiB | Mykespace | 1024434117767101090 |
-| 172.30.0.61 | 1b     | Up       | Normal  | 541.59 MiB | Mykespace | 1043327858966261499 |
+| Address     | Rack   | Status   | State   | Load       | Owns   |               Token |
+|-------------|--------|----------|---------|------------|--------|---------------------|
+| 172.30.0.64 | 1b     | Up       | Normal  | 551.31 MiB | ?      | 1006916943685901788 |
+| 172.30.0.62 | 1b     | Up       | Normal  | 541.59 MiB | ?      | 1024434117767101090 |
+| 172.30.0.61 | 1b     | Up       | Normal  | 541.59 MiB | ?      | 1043327858966261499 |
 
 You can specify a `<keyspace>` name to filter the output and focus on
 a specific keyspace. Another optional argument `<table>` allows you
@@ -35508,7 +35567,8 @@ Remove faulty data, eliminate tombstoned rows that have surpassed the table’s 
                 [(-m <scrub_mode> | --mode <scrub_mode>)]
                 [(-q <quarantine_mode> | --quarantine-mode <quarantine_mode>)]
                 [--drop-unfixable-sstables]
-                [--] <keyspace> [<table...>]
+                [--quarantine-invalid-sstables <true|false>]
+                [--] [<keyspace> [<table...>]]
 
 Supported scrub modes: VALIDATE, ABORT, SKIP, SEGREGATE
 Supported quarantine modes: INCLUDE, EXCLUDE, ONLY
@@ -35527,7 +35587,7 @@ Supported quarantine modes: INCLUDE, EXCLUDE, ONLY
 
 `--` This option can be used to separate command-line options from the list of argument, (useful when arguments might be mistaken for command-line options.
 
-`<keyspace>` The keyspace to scrub.
+`<keyspace>` The keyspace to scrub. By default, all keyspaces are scrubbed.
 
 `[<table...>]` Optional. One or more tables to scrub.  By default, all tables in the keyspace are scrubbed.
 
@@ -35621,7 +35681,7 @@ Quarantined SSTables are handled distinctly:
 
 The purpose of the quarantine is to keep corrupt SSTables out of compaction, which can spread the compaction or can get in a fail-retry loop. It also makes corrupt SSTables easy to find and retrieve for investigation.
 
-It is possible to opt-out from quarantining SSTables by passing `--quarantine-invalid-sstables=false` to nodetool.
+It is possible to opt-out from quarantining SSTables by passing `--mode=VALIDATE --quarantine-invalid-sstables=false` to nodetool.
 
 **Step 2** (Optional): Preserve quarantined SSTables for analysis:
 
@@ -40582,7 +40642,7 @@ For example:
 
 # Nodetool setcompactionthroughput
 
-**setcompactionthroughput** - Print the throughput cap for compaction in the system
+**setcompactionthroughput** - Set the throughput cap for compaction in the system, in MiB/s
 
 Setting zero throughput disables capping
 
@@ -40603,7 +40663,7 @@ See also
 
 # Nodetool setlogginglevel
 
-**setlogginglevel** sets the level log threshold for a given component or class during runtime. If this command is called with no parameters, the log level is reset to the initial configuration.
+**setlogginglevel** sets the level log threshold for a given component or class during runtime. Both `<class>` and `<level>` are required; resetting log levels is not supported.
 
 #### NOTE
 Using trace or debug logging levels will create very large log files where the readers may not find what they are looking for. It is best to use these levels for a very short period of time or with the help of ScyllaDB Support.
@@ -40811,14 +40871,14 @@ wasm
 
 # Nodetool setstreamthroughput
 
-**setstreamthroughput** - Print the throughput cap for SSTables streaming in the system
+**setstreamthroughput** - Set the throughput cap for SSTables streaming in the system, in MiB/s
 
 Setting zero throughput disables capping
 
 ## Syntax
 
 ```console
-nodetool [options] setstreamthroughput <value_in_mb>
+nodetool [options] setstreamthroughput <value_in_mib>
 ```
 
 See also
@@ -40865,10 +40925,10 @@ nodetool settraceprobability 0.1
 nodetool [(-h <host> | --host <host>)] [(-p <port> | --port <port>)]
      [(-pp | --print-port)] [(-pw <password> | --password <password>)]
      [(-pwf <passwordFilePath> | --password-file <passwordFilePath>)]
-     [(-u <username> | --username <username>)] [cluster] snapshot
+     [(-u <username> | --username <username>)] snapshot
      [(-cf <table> | --column-family <table> | --table <table>)]
      [(-kc <kclist> | --kc.list <kclist>)]
-     [(-sf | --skip-flush)] [(-t <tag> | --tag <tag>)] [--ttl <ttl>] [--] [<keyspaces...>]
+     [--skip-flush] [(-t <tag> | --tag <tag>)] [--ttl <ttl>] [--] [<keyspaces...>]
 ```
 
 ## OPTIONS
@@ -40877,9 +40937,9 @@ nodetool [(-h <host> | --host <host>)] [(-p <port> | --port <port>)]
 |--------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `-cf <table>` / `--column-family <table>`, `--table <table>` | The table name (you must specify one and only one keyspace for using this option).<br/>The table can be a regular table, a materialized view, or an index. For an index,<br/>the name of the materialized view backing the index should be used. |
 | `-h <host>` / `--host <host>`                                | Node hostname or ip address                                                                                                                                                                                                                      |
-| `-kc <ktlist>`, `--kc.list <ktlist>`                         | The list of Keyspaces to take snapshot                                                                                                                                                                                                           |
+| `-kc <ktlist>`, `--kc.list <ktlist>`                         | A comma-separated list of keyspaces to snapshot, or a single `<keyspace>.<table>` pair                                                                                                                                                           |
 | `-p <port>` / `--port <port>`                                | The port of the REST API of the ScyllaDB node.                                                                                                                                                                                                   |
-| `-sf` / `--skip-flush`                                       | Do not flush memtables before snapshotting (snapshot will not contain unflushed data)                                                                                                                                                            |
+| `--skip-flush`                                               | Do not flush memtables before snapshotting (snapshot will not contain unflushed data)                                                                                                                                                            |
 | `-t <tag>` / `--tag <tag>`                                   | The name of the snapshot                                                                                                                                                                                                                         |
 | `--ttl <ttl>`                                                | The time-to-live for the snapshot, optionally followed by:<br/>‘s’ for seconds (the default), ‘m’ for minutes, ‘h’ for hours, or ‘d’ for days.<br/>Missing TTL, or 0, means no TTL                                                               |
 
@@ -40888,7 +40948,12 @@ nodetool [(-h <host> | --host <host>)] [(-p <port> | --port <port>)]
 `[<keyspaces...>]` List of keyspaces. By default, all keyspaces.
 
 The ‘cluster snapshot’ version of this command will issue the snapshot on all nodes in the cluster, whereas
-the non-cluster version only operates on the destination node.
+the non-cluster version only operates on the destination node. The ‘cluster snapshot’ version supports only the
+`--table` and `-t`/`--tag` options and the list of keyspaces:
+
+```shell
+nodetool cluster snapshot [--table <table>] [(-t <tag> | --tag <tag>)] [<keyspaces...>]
+```
 
 ## Examples
 
@@ -40896,31 +40961,31 @@ Snapshot **all** the keyspaces
 
 ```shell
 > nodetool snapshot
-Requested creating snapshot(s) for [all keyspaces] with snapshot name [1564577645291] and options {skipFlush=false}
+Requested creating snapshot(s) for [all keyspaces] with snapshot name [1564577645291] and options {skipFlush=false, ttl=0}
 Snapshot directory: 1564577645291
 ```
 
 Snapshot **a** keyspace (mykeyspace)
 
 ```shell
-> nodetool snapshot mykeyspace;
-Requested creating snapshot(s) for [mykeyspace] with snapshot name [1564577611409] and options {skipFlush=false}
+> nodetool snapshot mykeyspace
+Requested creating snapshot(s) for [mykeyspace] with snapshot name [1564577611409] and options {skipFlush=false, ttl=0}
 Snapshot directory: 1564577611409
 ```
 
 Snapshot a **list** of keyspaces
 
 ```shell
->nodetool snapshot -kc mykeyspace,yourkeyspace
-Requested creating snapshot(s) for [mykeyspace,yourkeyspace] with snapshot name [1564639559884] and options {skipFlush=false}
+> nodetool snapshot -kc mykeyspace,yourkeyspace
+Requested creating snapshot(s) for [mykeyspace,yourkeyspace] with snapshot name [1564639559884] and options {skipFlush=false, ttl=0}
 Snapshot directory: 1564639559884
 ```
 
 Snapshot **a** table (heartrate)
 
 ```shell
-> nodetool snapshot --table heartrate mykeyspace;
-Requested creating snapshot(s) for [mykeyspace] with snapshot name [1564577586524] and options {skipFlush=false}
+> nodetool snapshot --table heartrate mykeyspace
+Requested creating snapshot(s) for [mykeyspace] with snapshot name [1564577586524] and options {skipFlush=false, ttl=0}
 Snapshot directory: 1564577586524
 ```
 
@@ -40933,7 +40998,7 @@ The snapshot is created in a `snapshot` directory in the table SSTable data dire
 1564577586524  1564577611409  1564577645291
 ```
 
-Each of the snapshots is a **hardlink** to to the SSTable directory.
+Each of the snapshots is a **hardlink** to the SSTable directory.
 
 ```shell
 > ls -1a /var/lib/scylla/data/mykeyspace/heartrate-07669030b39211e9a057000000000000/snapshots/1564577586524
@@ -43754,7 +43819,11 @@ A workaround for this issue would be to select the static column in a second req
 **status** - This command prints the cluster information for a single keyspace or all keyspaces.
 
 The keyspace argument is required to calculate effective ownership information (`Owns` column).
-For tablet keyspaces, a table is also required for effective ownership.
+For tablet keyspaces, a table is also required for effective ownership and for the token count (`Tokens` column).
+
+Syntax: `nodetool status [(-r | --resolve-ip)] [<keyspace> [<table>]]`
+
+* `-r` or `--resolve-ip` - Show node domain names instead of IP addresses.
 
 For example:
 
@@ -43783,7 +43852,7 @@ XN  127.0.0.4  149.07 MiB  256     32.3%             dd961642-c7c6-4962-9f5a-ea7
 | State       | `N` - Normal<br/><br/>`L` - Leaving<br/><br/>`J` - Joining<br/><br/>`M` - Moving                                                                                                                                                                 |
 | Address     | The IP address of the node.                                                                                                                                                                                                                      |
 | Load        | The size on disk the ScyllaDB data<br/>: takes up (updates every 60 seconds).                                                                                                                                                                    |
-| Tokens      | The number of tokens per node.                                                                                                                                                                                                                   |
+| Tokens      | The number of tokens per node.<br/>For a tablet keyspace with a table specified, the number of<br/>tablets for which the node is the primary replica; `?` if<br/>no table is given.                                                              |
 | Owns        | The percentage of data owned by<br/>the node (per datacenter) multiplied by<br/>the replication factor you are using.<br/><br/>For example, if the node owns 25% of<br/>the data and the replication factor<br/>is 4, the value will equal 100%. |
 | Host ID     | The unique identifier (UUID)<br/>automatically assigned to the node.                                                                                                                                                                             |
 | Rack        | The name of the rack.                                                                                                                                                                                                                            |
@@ -43883,8 +43952,9 @@ For example:
 
 ```default
 nodetool statusbinary
-Result can be one of the following:running Ornot running
 ```
+
+The result can be one of the following: `running` or `not running`.
 
 See also
 
@@ -43970,16 +44040,17 @@ nodetool <options> stop -- <compaction_type>
 
 Supported compaction types:
 
-| Type         | Stops                                                                                                                                            |
-|--------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| `COMPACTION` | Regular (automatic) compactions and major compactions                                                                                            |
-| `REGULAR`    | Regular (automatic) compactions only                                                                                                             |
-| `MAJOR`      | Major compactions only                                                                                                                           |
-| `CLEANUP`    | Cleanup compactions (see [nodetool cleanup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cleanup.md))              |
-| `SCRUB`      | Scrub compactions (see [nodetool scrub](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/scrub.md))                    |
-| `UPGRADE`    | SSTable upgrades (see [nodetool upgradesstables](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/upgradesstables.md)) |
-| `RESHAPE`    | Reshape compactions                                                                                                                              |
-| `SPLIT`      | Tablet split compactions                                                                                                                         |
+| Type                | Stops                                                                                                                                            |
+|---------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `COMPACTION`        | Regular (automatic) compactions and major compactions                                                                                            |
+| `REGULAR`           | Regular (automatic) compactions only                                                                                                             |
+| `MAJOR`             | Major compactions only                                                                                                                           |
+| `CLEANUP`           | Cleanup compactions (see [nodetool cleanup](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/cleanup.md))              |
+| `SCRUB`             | Scrub compactions (see [nodetool scrub](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/scrub.md))                    |
+| `UPGRADE`           | SSTable upgrades (see [nodetool upgradesstables](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/upgradesstables.md)) |
+| `RESHAPE`           | Reshape compactions                                                                                                                              |
+| `SPLIT`             | Tablet split compactions                                                                                                                         |
+| `REWRITE_COMPONENT` | SSTable component rewrites                                                                                                                       |
 
 Stopping a compaction by id (`--id <id>`) is not implemented.
 
@@ -44355,7 +44426,7 @@ Provides statistics about one or more tables.
 ## Syntax
 
 ```console
-nodetool tablestats [<keyspace.cfname>...]
+nodetool tablestats [(-i | --ignore)] [(-H | --human-readable)] [(-F | --format) <format>] [<keyspace.cfname>...]
 ```
 
 Typically, the keyspace and cfname are separated by a dot character. However, if either of them contains a dot, you can
@@ -44375,6 +44446,12 @@ nodetool tablestats my.keyspace/
 
 If you don’t add `/`, nodetool will assume that “my” is the keyspace and “keyspace” is the cfname.
 
+## Options
+
+* `-i` or `--ignore` - Ignore the listed tables/keyspaces and display all the remaining ones.
+* `-H` or `--human-readable` - Display bytes in human readable form, i.e. KiB, MiB, GiB, TiB.
+* `-F` or `--format` - Output format: `plain` (default), `json` or `yaml`.
+
 ## Example
 
 ```shell
@@ -44384,43 +44461,49 @@ nodetool tablestats
 Example output:
 
 ```shell
-Keyspace: keyspace1
-Read Count: 0
-Read Latency: NaN ms.
-Write Count: 41656
-Write Latency: 0.016199467063568274 ms.
-Pending Flushes: 0
-Table: standard1
-SSTable count: 17
-SSTables in each level: [ ]
-Space used (live): 28331544
-Space used (total): 38060888
-Space used by snapshots (total): 0
-Off heap memory used (total): 5505072
-SSTable Compression Ratio: 0.0
-Number of partitions (estimate): 26829
-Memtable cell count: 4868
-Memtable data size: 4128083
-Memtable off heap memory used: 4980736
-Memtable switch count: 0
-Local read count: 0
-Local read latency: NaN ms
-Local write count: 41656
-Local write latency: 0.014 ms
-Pending flushes: 0
-Bloom filter false positives: 0
-Bloom filter false ratio: 0.00000
-Bloom filter space used: 0
-Bloom filter off heap memory used: 524336
-Index summary off heap memory used: 0
-Compression metadata off heap memory used: 0
-Compacted partition minimum bytes: 259
-Compacted partition maximum bytes: 310
-Compacted partition mean bytes: 310
-Average live cells per slice (last five minutes): 0.0
-Maximum live cells per slice (last five minutes): 0.0
-Average tombstones per slice (last five minutes): 0.0
-Maximum tombstones per slice (last five minutes): 0.0
+Total number of tables: 1
+----------------
+Keyspace : keyspace1
+    Read Count: 0
+    Read Latency: NAN ms
+    Write Count: 41656
+    Write Latency: 1.619946706356827E-02 ms
+    Pending Flushes: 0
+        Table: standard1
+        SSTable count: 17
+        SSTables in each level: [ ]
+        Space used (live): 28331544
+        Space used (total): 38060888
+        Space used by snapshots (total): 0
+        Off heap memory used (total): 5505072
+        SSTable Compression Ratio: 0.00
+        Number of partitions (estimate): 26829
+        Memtable cell count: 4868
+        Memtable data size: 4128083
+        Memtable off heap memory used: 4980736
+        Memtable switch count: 0
+        Local read count: 0
+        Local read latency: nan ms
+        Local write count: 41656
+        Local write latency: 0.014 ms
+        Pending flushes: 0
+        Percent repaired: 0.0
+        Bloom filter false positives: 0
+        Bloom filter false ratio: 0.00000
+        Bloom filter space used: 0
+        Bloom filter off heap memory used: 524336
+        Index summary off heap memory used: 0
+        Compression metadata off heap memory used: 0
+        Compacted partition minimum bytes: 259
+        Compacted partition maximum bytes: 310
+        Compacted partition mean bytes: 310
+        Average live cells per slice (last five minutes): 0.0
+        Maximum live cells per slice (last five minutes): 0
+        Average tombstones per slice (last five minutes): 0.0
+        Maximum tombstones per slice (last five minutes): 0
+        Dropped Mutations: 0
+
+----------------
 ```
 
 | Parameter                                        | Description                                                                       |
@@ -44455,9 +44538,9 @@ Maximum tombstones per slice (last five minutes): 0.0
 | Bloom filter off heap memory used                | In scylla all memory is off heap                                                  |
 | Index summary off heap memory used               | Memory taken by the Index summary                                                 |
 | Compression metadata off heap memory used        | Off heap memory used for metadata compression                                     |
-| Compacted partition minimum bytes                | Minimum bytes used for partition compression                                      |
-| Compacted partition maximum bytes                | Maximum bytes used for partition compression                                      |
-| Compacted partition mean bytes                   | Mean bytes used for partition compression                                         |
+| Compacted partition minimum bytes                | Size of the smallest partition, in bytes                                          |
+| Compacted partition maximum bytes                | Size of the largest partition, in bytes                                           |
+| Compacted partition mean bytes                   | Mean partition size, in bytes                                                     |
 | Average live cells per slice (last five minutes) | Average live cells per slice                                                      |
 | Maximum live cells per slice (last five minutes) | Maximum live cells per slice                                                      |
 | Average tombstones per slice (last five minutes) | Average tombstones per slice                                                      |
@@ -45150,22 +45233,23 @@ ALTER TABLE <keyspace>.<mytable> WITH gc_grace_seconds = <oldValue>;
 
 # Nodetool toppartitions
 
-**toppartitions** <keyspace> <table> <duration> - Samples cluster writes and reads and reports the most active partitions in a specified table and time frame.
+**toppartitions** <keyspace> <table> <duration> - Samples the writes and reads on the node and reports the most active partitions in the specified table(s) and time frame.
 
-**toppartitions**  [<–ks-filters ks>] [<–cf-filters tables>] [<-d duration>] [<-s|–capacity capacity>] [<-a|–samplers samplers>]
+**toppartitions** `[--ks-filters <keyspaces>] [--cf-filters <tables>] [-d|--duration <duration>] [-s|--capacity <capacity>] [-k|--size <size>] [-a|--samplers <samplers>]`
 
 #### NOTE
 The command needs to be run while there are writes and reads operations.
 
-| Parameter   | Description                                                                                            |
-|-------------|--------------------------------------------------------------------------------------------------------|
-| keyspace    | The keyspace name                                                                                      |
-| table       | The table name                                                                                         |
-| duration    | The duration in milliseconds (requires a `-d` prefix)                                                  |
-| ks-filters  | List of keyspaces                                                                                      |
-| cf-filters  | List of Tables (Column Families)                                                                       |
-| capacity    | The capacity of the sampler; higher values increase accuracy at the cost of memory (default 256 keys). |
-| samplers    | The samplers to use; `WRITES`, `READS`, or both (default).                                             |
+| Parameter   | Description                                                                                                                                                        |
+|-------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| keyspace    | The keyspace name                                                                                                                                                  |
+| table       | The table name                                                                                                                                                     |
+| duration    | The duration in milliseconds. Given positionally together with keyspace and table, or with `-d`/`--duration` (default 5000) when no positional arguments are used. |
+| ks-filters  | List of keyspaces                                                                                                                                                  |
+| cf-filters  | List of Tables (Column Families)                                                                                                                                   |
+| capacity    | The capacity of the sampler; higher values increase accuracy at the cost of memory (default 256 keys).                                                             |
+| size        | The number of top partitions to list (default 10); must be smaller than capacity.                                                                                  |
+| samplers    | The samplers to use; `WRITES`, `READS`, or both (default).                                                                                                         |
 
 For example:
 
@@ -45184,43 +45268,41 @@ Additional examples:
 Example output:
 
 ```shell
-WRITES Sampler:
-  Cardinality: ~5 (256 capacity)
-  Top 10 partitions:
-         Partition                Count       +/-
-         Russell Westbrook         100         0
-         Jermi Grant               25          0
-         Victor Oladipo            17          0
-         Andre Roberson            1           0
-         Steven Adams              1           0
-
 READS Sampler:
   Cardinality: ~5 (256 capacity)
   Top 10 partitions:
-         Partition                Count       +/-
-         Russell Westbrook         100         0
-         Victor Oladipo            17          0
-         Jermi Grant               12          0
-         Andre Roberson            5           0
-         Steven Adams              1           0
+        Partition                               Count       +/-
+        (nba:team_roster) Russell Westbrook       100         0
+        (nba:team_roster) Victor Oladipo           17         0
+        (nba:team_roster) Jermi Grant              12         0
+        (nba:team_roster) Andre Roberson            5         0
+        (nba:team_roster) Steven Adams              1         0
+
+WRITES Sampler:
+  Cardinality: ~5 (256 capacity)
+  Top 10 partitions:
+        Partition                               Count       +/-
+        (nba:team_roster) Russell Westbrook       100         0
+        (nba:team_roster) Jermi Grant              25         0
+        (nba:team_roster) Victor Oladipo           17         0
+        (nba:team_roster) Andre Roberson            1         0
+        (nba:team_roster) Steven Adams              1         0
 ```
 
 In this example, we can see that for the `Partition` with `Partition Key` “Russell Westbrook”, 100 writes and 100 read operations were done during the set duration.
 
 For each of the samplers (WRITES and READS in this specific example), nodetool toppartitions reports:
 
-* The cardinality of the sampled operations (number of unique operations in the sample set).
+* The cardinality of the sampled operations (number of distinct partitions sampled, bounded by the capacity).
 * The number of partitions in a specified table that had the most traffic in a specified time period.
 
 ## Output
 
-| Parameter     | Description                                                                                   |
-|---------------|-----------------------------------------------------------------------------------------------|
-| Partition     | The Partition Key, prefixed by the Keyspace and table (ks:cf)                                 |
-| Count         | The number of operations of the specified type that occurred during the specified time period |
-| +/-           | The margin of error for the Count statistic                                                   |
-| Write Count   | The total number of writes since last boot                                                    |
-| Write Latency | The average read latency                                                                      |
+| Parameter   | Description                                                                                   |
+|-------------|-----------------------------------------------------------------------------------------------|
+| Partition   | The Partition Key, prefixed by the Keyspace and table (ks:cf)                                 |
+| Count       | The number of operations of the specified type that occurred during the specified time period |
+| +/-         | The margin of error for the Count statistic                                                   |
 
 To know which node hold the partition key use the nodetool [getendpoints](https://docs.scylladb.com/manual/master/operating-scylla/nodetool-commands/getendpoints.md) command.
 
@@ -47445,7 +47527,7 @@ Where:
 `[upgrade target]` indicates what you are upgrading and can be any of the following:
 
 * `--include-all-sstables | -a` - Upgrades all SSTables by force, including those already in the new SSTable format.
-* `--jobs <jobs> | -j <jobs>` - Indicates the number of SSTables you want to upgrade simultaneously. Setting this parameter to `0` uses all available compaction threads.
+* `--jobs <jobs> | -j <jobs>` - Accepted for compatibility, ignored.
 * `keyspace-name` - Updates all SSTables for all tables in the indicated keyspace
 * `table-name` - Updates all SSTables for the indicated table or tables, with each table separated by a space. To specify a table, you must include the `keyspace-name` and the `table-name` separated by a space.
 * `--` Separator which can be used to separate an option from an argument. For example, if you are using the `-a` flag, use the separator between the flag and the `keyspace-name`
@@ -47472,11 +47554,11 @@ To upgrade all three tables (A, B, and E) you add the -a flag which forces an up
 
 To upgrade all old format tables in both keyspaces:
 
-`nodetool upgradesstables KeyspaceA KeyspaceB`
+`nodetool upgradesstables KeyspaceA` and `nodetool upgradesstables KeyspaceB`
 
 To upgrade all tables (old and new format) in both keyspaces:
 
-`nodetool upgradesstables -a -- KeyspaceA KeyspaceB`
+`nodetool upgradesstables -a -- KeyspaceA` and `nodetool upgradesstables -a -- KeyspaceB`
 
 ## Additional References
 
@@ -48194,13 +48276,15 @@ ReleaseVersion: 3.0.8
 
 **viewbuildstatus** - `<keyspace> <view>` Shows the progress of a materialized view build.
 
+The view can also be given as `<keyspace>.<view>`. The command exits with status 1 if the view has not finished building on all nodes.
+
 For example:
 
 ```default
 nodetool viewbuildstatus my_keyspace my_view
 
 
-my_view has not finished building; node status is below.
+my_keyspace.my_view has not finished building; node status is below.
 
  Host                Info
 
@@ -48272,25 +48356,25 @@ For example:
 ## Example output
 
 ```shell
-id : 29dd6552-1e9a-4f17-b2c9-231d088fbee6
-type : repair
-kind : node
-scope : keyspace
-state : done
-is_abortable : true
-start_time : 2024-07-29T17:00:53Z
-end_time : 2024-07-29T17:00:53Z
-error :
-parent_id : none
-sequence_number : 2
-shard : 0
-keyspace : abc
-table :
-entity :
-progress_units : ranges
-progress_total : 4
-progress_completed : 4
-children_ids : [{task_id: 5d74a62e-aaf6-4993-b0f1-973899d89cd0, node: 127.0.0.1 }, {task_id: 055d5a59-d97c-45a8-a7e6-dcad39ed61ca, node: 127.0.0.1 }]
+id: 29dd6552-1e9a-4f17-b2c9-231d088fbee6
+type: repair
+kind: node
+scope: keyspace
+state: done
+is_abortable: true
+start_time: 2024-07-29T17:00:53Z
+end_time: 2024-07-29T17:00:53Z
+error:
+parent_id: none
+sequence_number: 2
+shard: 0
+keyspace: abc
+table:
+entity:
+progress_units: ranges
+progress_total: 4
+progress_completed: 4
+children_ids: [{task_id: 5d74a62e-aaf6-4993-b0f1-973899d89cd0, node: 127.0.0.1 }, {task_id: 055d5a59-d97c-45a8-a7e6-dcad39ed61ca, node: 127.0.0.1 }]
 ```
 
 ## See also
